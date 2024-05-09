@@ -26,7 +26,6 @@ func (s *WebServer) AddRoute(path string, handler http.HandlerFunc) {
 }
 
 func (s *WebServer) Start() {
-
 	mux := http.NewServeMux()
 	// mux.HandleFunc("GET /{id}", GetHandler)
 	// mux.HandleFunc("GET /dir/{d...}", PathHandler)
