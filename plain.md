@@ -15,6 +15,7 @@
   - Data
   - Data pagamento
   - Tempo
+- Buscar uma lista de no máximo 5 pacientes por um termo
 - Deletar uma sessão/atendimento
 
 - Relatórios

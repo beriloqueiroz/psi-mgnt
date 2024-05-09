@@ -45,8 +45,8 @@ func (u *CreateSessionUseCase) Execute(ctx context.Context, input CreateSessionI
 	if err != nil {
 		return dto, err
 	}
-	if (domain.Patient{} == *patient) {
-		patient, err = domain.NewPatient(uuid.New().String(), input.PatientName, "", "", domain.Phone{})
+	if patient.IsEmpty() {
+		patient, err = domain.NewPatient(uuid.New().String(), input.PatientName, "", "", []domain.Phone{})
 		if err != nil {
 			return dto, err
 		}

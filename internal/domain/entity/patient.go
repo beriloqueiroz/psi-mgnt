@@ -7,16 +7,16 @@ type Patient struct {
 	Name     string
 	Document string
 	Email    string
-	Phone    Phone
+	Phones   []Phone
 }
 
-func NewPatient(id string, name string, document string, email string, phone Phone) (*Patient, error) {
+func NewPatient(id string, name string, document string, email string, phones []Phone) (*Patient, error) {
 	patient := &Patient{
 		ID:       id,
 		Name:     name,
 		Document: document,
 		Email:    email,
-		Phone:    phone,
+		Phones:   phones,
 	}
 	err := patient.IsValid()
 	if err != nil {
@@ -33,4 +33,8 @@ func (p *Patient) IsValid() error {
 		return errors.New("invalid name")
 	}
 	return nil
+}
+
+func (p *Patient) IsEmpty() bool {
+	return p.Document == "" && p.Email == "" && p.ID == "" && p.Name == ""
 }
