@@ -36,7 +36,7 @@ type PhoneOutputDTO struct {
 
 func (u *SearchPatientsUseCase) Execute(ctx context.Context, input SearchPatientsInputDTO) ([]SearchPatientsOutputDTO, error) {
 	dto := []SearchPatientsOutputDTO{}
-	patients, err := u.SessionRepository.SearchPatientsByName(input.Term, 10, 0)
+	patients, err := u.SessionRepository.SearchPatientsByName(ctx, input.Term, 10, 0)
 	if err != nil {
 		return []SearchPatientsOutputDTO{}, err
 	}

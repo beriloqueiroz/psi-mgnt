@@ -41,7 +41,7 @@ type CreateSessionOutputDTO struct {
 
 func (u *CreateSessionUseCase) Execute(ctx context.Context, input CreateSessionInputDTO) (CreateSessionOutputDTO, error) {
 	dto := CreateSessionOutputDTO{}
-	patient, err := u.SessionRepository.FindPatientByName(input.PatientName)
+	patient, err := u.SessionRepository.FindPatientByName(ctx, input.PatientName)
 	if err != nil {
 		return dto, err
 	}
@@ -50,7 +50,7 @@ func (u *CreateSessionUseCase) Execute(ctx context.Context, input CreateSessionI
 		if err != nil {
 			return dto, err
 		}
-		err := u.SessionRepository.CreatePatient(patient)
+		err := u.SessionRepository.CreatePatient(ctx, patient)
 		if err != nil {
 			return dto, err
 		}
@@ -59,7 +59,7 @@ func (u *CreateSessionUseCase) Execute(ctx context.Context, input CreateSessionI
 	if err != nil {
 		return dto, err
 	}
-	u.SessionRepository.Create(session)
+	u.SessionRepository.Create(ctx, session)
 	dto.ID = session.ID
 	dto.Price = session.Price
 	dto.Notes = session.Notes
