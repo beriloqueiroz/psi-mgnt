@@ -8,4 +8,5 @@ type SessionRepositoryInterface interface {
 	List(pageSize int, page int) ([]domain.Session, error)
 	FindPatientByName(name string) (*domain.Patient, error)
 	CreatePatient(patient *domain.Patient) error
+	SearchPatientsByName(term string, pageSize int, page int) ([]domain.Patient, error)
 }

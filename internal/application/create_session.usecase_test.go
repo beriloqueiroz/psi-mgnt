@@ -41,6 +41,11 @@ func (m *mockSessionRepository) CreatePatient(patient *domain.Patient) error {
 	return args.Error(0)
 }
 
+func (m *mockSessionRepository) SearchPatientsByName(term string, pageSize int, page int) ([]domain.Patient, error) {
+	args := m.Called(term)
+	return args.Get(0).([]domain.Patient), args.Error(1)
+}
+
 func TestCreateSessionUseCase_Execute(t *testing.T) {
 	// Criação do mock do repository
 	mockRepo := new(mockSessionRepository)
