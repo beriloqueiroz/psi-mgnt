@@ -13,13 +13,10 @@ import (
 )
 
 func TestCreateSessionUseCase_Execute(t *testing.T) {
-	// Criação do mock do repository
 	mockRepo := new(mockSessionRepository)
 
-	// Caso de uso
 	useCase := NewCreateSessionUseCase(mockRepo)
 
-	// Entrada para o caso de uso
 	input := CreateSessionInputDTO{
 		Price:       100,
 		Notes:       "Test notes",
@@ -29,20 +26,16 @@ func TestCreateSessionUseCase_Execute(t *testing.T) {
 		PatientName: "John Doe",
 	}
 
-	// Simulando busca de paciente existente
 	existingPatient := &domain.Patient{
 		ID:   uuid.New().String(),
 		Name: "John Doe",
 	}
 	mockRepo.On("FindPatientByName", input.PatientName).Return(existingPatient, nil)
 
-	// Simulando criação de sessão
 	mockRepo.On("Create", mock.Anything).Return(nil)
 
-	// Executando caso de uso
 	output, err := useCase.Execute(context.Background(), input)
 
-	// Verificando resultados
 	assert.NoError(t, err)
 	assert.NotNil(t, output)
 	assert.Equal(t, input.Price, output.Price)
@@ -54,7 +47,6 @@ func TestCreateSessionUseCase_Execute(t *testing.T) {
 	mockRepo.AssertNumberOfCalls(t, "Create", 1)
 	mockRepo.AssertNumberOfCalls(t, "FindPatientByName", 1)
 
-	// Verificando chamadas ao repositório
 	mockRepo.AssertExpectations(t)
 }
 
