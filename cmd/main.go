@@ -1,10 +1,12 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 
 	"github.com/beriloqueiroz/psi-mgnt/config"
+	"github.com/beriloqueiroz/psi-mgnt/internal/application"
+	infra "github.com/beriloqueiroz/psi-mgnt/internal/infra/database"
 	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/routes"
 	webserver "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/server"
 
@@ -18,15 +20,23 @@ func main() {
 		panic(err)
 	}
 
-	db, err := sql.Open(configs.DBDriver, fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", configs.DBUser, configs.DBPassword, configs.DBHost, configs.DBPort, configs.DBName))
+	server := webserver.NewWebServer(configs.WebServerPort)
+
+	initCtx := context.Background()
+	var sessionRepository application.SessionRepositoryInterface
+	sessionRepository, err = infra.NewMongoSessionRepository(
+		initCtx,
+		configs.DBUri,
+		configs.DBPatientCollection,
+		configs.DBSessionCollection,
+		configs.DBDatabase)
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
+	createSessionUseCase := application.NewCreateSessionUseCase(sessionRepository)
+	createSessionRoute := routes.NewCreateSessionRoute(*createSessionUseCase)
 
-	server := webserver.NewWebServer(configs.WebServerPort)
-	msgRoute := routes.NewWebMsgRoute("olá dev loco")
-	server.AddRoute("GET /", msgRoute.Handler)
+	server.AddRoute("POST /", createSessionRoute.Handler)
 
 	fmt.Println("Starting web server on port", configs.WebServerPort)
 	server.Start()

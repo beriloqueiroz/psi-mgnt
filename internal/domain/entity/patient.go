@@ -34,7 +34,3 @@ func (p *Patient) IsValid() error {
 	}
 	return nil
 }
-
-func (p *Patient) IsEmpty() bool {
-	return p.Document == "" && p.Email == "" && p.ID == "" && p.Name == ""
-}
