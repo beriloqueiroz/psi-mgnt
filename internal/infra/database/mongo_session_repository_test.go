@@ -134,7 +134,7 @@ func TestCreateSession_WhenPatientNotExist(t *testing.T) {
 	assert.Equal(t, session.Notes, list[0].Notes)
 }
 
-func TestFinsPatientByName(t *testing.T) {
+func TestFindPatientByName(t *testing.T) {
 	before()
 	defer after()
 	patient1, err := domain.NewPatient(
@@ -235,4 +235,132 @@ func TestSearchPatientsByTermName(t *testing.T) {
 	assert.NotNil(t, founds)
 	assert.Equal(t, len(founds), 1)
 	assert.Equal(t, patient3.Name, founds[0].Name)
+}
+
+func TestListPatientsByTermName(t *testing.T) {
+	before()
+	defer after()
+	patient1, err := domain.NewPatient(
+		uuid.NewString(),
+		"berilo jose",
+		"12365478",
+		"",
+		[]domain.Phone{},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	session1, err := domain.NewSession(uuid.NewString(), 100, "notes de doido", time.Now(), time.Now(), time.Hour, patient1)
+	if err != nil {
+		panic(err)
+	}
+	session2, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 1", time.Now(), time.Now(), time.Hour, patient1)
+	if err != nil {
+		panic(err)
+	}
+	session3, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 2", time.Now(), time.Now(), time.Hour, patient1)
+	if err != nil {
+		panic(err)
+	}
+
+	err = mongoRepo.Create(ctx, session1)
+	if err != nil {
+		panic(err)
+	}
+	err = mongoRepo.Create(ctx, session2)
+	if err != nil {
+		panic(err)
+	}
+	err = mongoRepo.Create(ctx, session3)
+
+	if err != nil {
+		panic(err)
+	}
+	founds, err := mongoRepo.List(ctx, 10, 0)
+
+	if err != nil {
+		panic(err)
+	}
+
+	assert.Nil(t, err)
+	assert.NotNil(t, founds)
+	assert.Equal(t, len(founds), 3)
+	assert.Equal(t, session1.ID, founds[0].ID)
+	assert.Equal(t, session2.ID, founds[1].ID)
+	assert.Equal(t, session3.ID, founds[2].ID)
+}
+
+func TestDeletePatientsByTermName(t *testing.T) {
+	before()
+	defer after()
+	patient1, err := domain.NewPatient(
+		uuid.NewString(),
+		"berilo jose",
+		"12365478",
+		"",
+		[]domain.Phone{},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	session1, err := domain.NewSession(uuid.NewString(), 100, "notes de doido", time.Now(), time.Now(), time.Hour, patient1)
+	if err != nil {
+		panic(err)
+	}
+	session2, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 1", time.Now(), time.Now(), time.Hour, patient1)
+	if err != nil {
+		panic(err)
+	}
+	session3, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 2", time.Now(), time.Now(), time.Hour, patient1)
+	if err != nil {
+		panic(err)
+	}
+
+	err = mongoRepo.Create(ctx, session1)
+	if err != nil {
+		panic(err)
+	}
+	err = mongoRepo.Create(ctx, session2)
+	if err != nil {
+		panic(err)
+	}
+	err = mongoRepo.Create(ctx, session3)
+
+	if err != nil {
+		panic(err)
+	}
+
+	founds, err := mongoRepo.List(ctx, 10, 0)
+
+	if err != nil {
+		panic(err)
+	}
+
+	assert.Nil(t, err)
+	assert.NotNil(t, founds)
+	assert.Equal(t, len(founds), 3)
+	assert.Equal(t, session1.ID, founds[0].ID)
+	assert.Equal(t, session2.ID, founds[1].ID)
+	assert.Equal(t, session3.ID, founds[2].ID)
+
+	err = mongoRepo.Delete(ctx, session2.ID)
+
+	if err != nil {
+		panic(err)
+	}
+
+	founds, err = mongoRepo.List(ctx, 10, 0)
+
+	if err != nil {
+		panic(err)
+	}
+
+	assert.Nil(t, err)
+	assert.NotNil(t, founds)
+	assert.Equal(t, len(founds), 2)
+	assert.Equal(t, session1.ID, founds[0].ID)
+	assert.Equal(t, session3.ID, founds[1].ID)
+
 }
