@@ -21,9 +21,9 @@ func (m *mockSessionRepository) Delete(ctx context.Context, id string) error {
 	return args.Error(0)
 }
 
-func (m *mockSessionRepository) List(ctx context.Context, pageSize int, page int) ([]domain.Session, error) {
+func (m *mockSessionRepository) List(ctx context.Context, pageSize int, page int) ([]*domain.Session, error) {
 	args := m.Called(pageSize, page)
-	return args.Get(0).([]domain.Session), args.Error(1)
+	return args.Get(0).([]*domain.Session), args.Error(1)
 }
 
 func (m *mockSessionRepository) FindPatientByName(ctx context.Context, name string) (*domain.Patient, error) {
@@ -36,7 +36,7 @@ func (m *mockSessionRepository) CreatePatient(ctx context.Context, patient *doma
 	return args.Error(0)
 }
 
-func (m *mockSessionRepository) SearchPatientsByName(ctx context.Context, term string, pageSize int, page int) ([]domain.Patient, error) {
+func (m *mockSessionRepository) SearchPatientsByName(ctx context.Context, term string, pageSize int, page int) ([]*domain.Patient, error) {
 	args := m.Called(term)
-	return args.Get(0).([]domain.Patient), args.Error(1)
+	return args.Get(0).([]*domain.Patient), args.Error(1)
 }

@@ -15,7 +15,7 @@ func TestSearchPatientsUseCase_Execute(t *testing.T) {
 
 	usecase := NewSearchPatientsUseCase(mockRepo)
 
-	patients := []domain.Patient{
+	patients := []*domain.Patient{
 		{
 			ID:   uuid.New().String(),
 			Name: "Aliba",

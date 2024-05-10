@@ -34,11 +34,11 @@ type PhoneOutputDTO struct {
 	IsMain bool   `json:"is_main"`
 }
 
-func (u *SearchPatientsUseCase) Execute(ctx context.Context, input SearchPatientsInputDTO) ([]SearchPatientsOutputDTO, error) {
-	dto := []SearchPatientsOutputDTO{}
+func (u *SearchPatientsUseCase) Execute(ctx context.Context, input SearchPatientsInputDTO) ([]*SearchPatientsOutputDTO, error) {
+	dto := []*SearchPatientsOutputDTO{}
 	patients, err := u.SessionRepository.SearchPatientsByName(ctx, input.Term, 10, 0)
 	if err != nil {
-		return []SearchPatientsOutputDTO{}, err
+		return []*SearchPatientsOutputDTO{}, err
 	}
 	for _, patient := range patients {
 		var phones []PhoneOutputDTO
@@ -49,7 +49,7 @@ func (u *SearchPatientsUseCase) Execute(ctx context.Context, input SearchPatient
 				IsMain: phone.IsMain,
 			})
 		}
-		dto = append(dto, SearchPatientsOutputDTO{
+		dto = append(dto, &SearchPatientsOutputDTO{
 			ID:       patient.ID,
 			Name:     patient.Name,
 			Document: patient.Document,
