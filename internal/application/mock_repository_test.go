@@ -28,6 +28,9 @@ func (m *mockSessionRepository) List(ctx context.Context, pageSize int, page int
 
 func (m *mockSessionRepository) FindPatientByName(ctx context.Context, name string) (*domain.Patient, error) {
 	args := m.Called(name)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
 	return args.Get(0).(*domain.Patient), args.Error(1)
 }
 

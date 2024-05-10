@@ -64,7 +64,7 @@ func TestCreateSessionUseCase_Execute_NewPatient(t *testing.T) {
 		PatientName: "John Doe",
 	}
 
-	mockRepo.On("FindPatientByName", input.PatientName).Return(&domain.Patient{}, nil)
+	mockRepo.On("FindPatientByName", mock.Anything).Return(nil, nil)
 
 	mockRepo.On("CreatePatient", mock.Anything).Return(nil)
 

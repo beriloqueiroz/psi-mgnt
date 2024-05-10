@@ -159,7 +159,6 @@ func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, term
 	}
 
 	cur.Close(ctx)
-	fmt.Println(results)
 	return results, nil
 }
 

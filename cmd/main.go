@@ -36,7 +36,15 @@ func main() {
 	createSessionUseCase := application.NewCreateSessionUseCase(sessionRepository)
 	createSessionRoute := routes.NewCreateSessionRoute(*createSessionUseCase)
 
+	searchPatientsUseCase := application.NewSearchPatientsUseCase(sessionRepository)
+	searchPatientsRoute := routes.NewSearchPatientsRoute(*searchPatientsUseCase)
+
+	deleteSessionUseCase := application.NewDeleteSessionUseCase(sessionRepository)
+	deleteSessionRoute := routes.NewDeleteSessionRoute(*deleteSessionUseCase)
+
 	server.AddRoute("POST /", createSessionRoute.Handler)
+	server.AddRoute("DELETE /{id}", deleteSessionRoute.Handler)
+	server.AddRoute("GET /patient", searchPatientsRoute.Handler)
 
 	fmt.Println("Starting web server on port", configs.WebServerPort)
 	server.Start()
