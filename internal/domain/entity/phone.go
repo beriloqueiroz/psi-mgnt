@@ -1,7 +1,7 @@
 package domain
 
 type Phone struct {
-	Value  string
-	IsChat bool
-	IsMain bool
+	Value  string `bson:"value"`
+	IsChat bool   `bson:"is_chat"`
+	IsMain bool   `bson:"is_main"`
 }

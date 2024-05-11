@@ -24,13 +24,14 @@ func TestCreateSessionUseCase_Execute(t *testing.T) {
 		PaymentDate: time.Now(),
 		Duration:    30 * time.Minute,
 		PatientName: "John Doe",
+		OwnerId:     "123",
 	}
 
 	existingPatient := &domain.Patient{
 		ID:   uuid.New().String(),
 		Name: "John Doe",
 	}
-	mockRepo.On("FindPatientByName", input.PatientName).Return(existingPatient, nil)
+	mockRepo.On("FindPatientByName", mock.Anything).Return(existingPatient, nil)
 
 	mockRepo.On("Create", mock.Anything).Return(nil)
 
@@ -62,6 +63,7 @@ func TestCreateSessionUseCase_Execute_NewPatient(t *testing.T) {
 		PaymentDate: time.Now(),
 		Duration:    30 * time.Minute,
 		PatientName: "John Doe",
+		OwnerId:     "123",
 	}
 
 	mockRepo.On("FindPatientByName", mock.Anything).Return(nil, nil)
@@ -99,9 +101,15 @@ func TestCreateSessionUseCase_Execute_FindPatientError(t *testing.T) {
 		PaymentDate: time.Now(),
 		Duration:    30 * time.Minute,
 		PatientName: "John Doe",
+		OwnerId:     "123",
 	}
 
-	mockRepo.On("FindPatientByName", input.PatientName).Return(&domain.Patient{}, errors.New("something went wrong"))
+	inputRepo := FindPatientByNameRepositoryInput{
+		OwnerId: "123",
+		Name:    input.PatientName,
+	}
+
+	mockRepo.On("FindPatientByName", inputRepo).Return(&domain.Patient{}, errors.New("something went wrong"))
 
 	_, err := useCase.Execute(context.Background(), input)
 

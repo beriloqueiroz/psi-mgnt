@@ -27,6 +27,7 @@ type CreateSessionInputDTO struct {
 	PaymentDate time.Time     `json:"payment_date"`
 	Duration    time.Duration `json:"duration"`
 	PatientName string        `json:"patient_name"`
+	OwnerId     string        `json:"owner_id"`
 }
 
 type CreateSessionOutputDTO struct {
@@ -41,12 +42,16 @@ type CreateSessionOutputDTO struct {
 
 func (u *CreateSessionUseCase) Execute(ctx context.Context, input CreateSessionInputDTO) (CreateSessionOutputDTO, error) {
 	dto := CreateSessionOutputDTO{}
-	patient, err := u.SessionRepository.FindPatientByName(ctx, input.PatientName)
+	inputRepo := FindPatientByNameRepositoryInput{
+		Name:    input.PatientName,
+		OwnerId: input.OwnerId,
+	}
+	patient, err := u.SessionRepository.FindPatientByName(ctx, inputRepo)
 	if err != nil {
 		return dto, err
 	}
 	if patient == nil {
-		patient, err = domain.NewPatient(uuid.New().String(), input.PatientName, "", "", []domain.Phone{})
+		patient, err = domain.NewPatient(uuid.New().String(), input.PatientName, "", "", []domain.Phone{}, input.OwnerId)
 		if err != nil {
 			return dto, err
 		}
@@ -55,7 +60,7 @@ func (u *CreateSessionUseCase) Execute(ctx context.Context, input CreateSessionI
 			return dto, err
 		}
 	}
-	session, err := domain.NewSession(uuid.New().String(), input.Price, input.Notes, input.Date, input.PaymentDate, input.Duration, patient)
+	session, err := domain.NewSession(uuid.New().String(), input.Price, input.Notes, input.Date, input.PaymentDate, input.Duration, patient, input.OwnerId)
 	if err != nil {
 		return dto, err
 	}

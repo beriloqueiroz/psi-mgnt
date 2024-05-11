@@ -16,18 +16,18 @@ func (m *mockSessionRepository) Create(ctx context.Context, session *domain.Sess
 	return args.Error(0)
 }
 
-func (m *mockSessionRepository) Delete(ctx context.Context, id string) error {
-	args := m.Called(id)
+func (m *mockSessionRepository) Delete(ctx context.Context, input DeleteRepositoryInput) error {
+	args := m.Called(input)
 	return args.Error(0)
 }
 
-func (m *mockSessionRepository) List(ctx context.Context, pageSize int, page int) ([]*domain.Session, error) {
-	args := m.Called(pageSize, page)
+func (m *mockSessionRepository) List(ctx context.Context, input ListRepositoryInput) ([]*domain.Session, error) {
+	args := m.Called(input)
 	return args.Get(0).([]*domain.Session), args.Error(1)
 }
 
-func (m *mockSessionRepository) FindPatientByName(ctx context.Context, name string) (*domain.Patient, error) {
-	args := m.Called(name)
+func (m *mockSessionRepository) FindPatientByName(ctx context.Context, input FindPatientByNameRepositoryInput) (*domain.Patient, error) {
+	args := m.Called(input)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
@@ -39,7 +39,7 @@ func (m *mockSessionRepository) CreatePatient(ctx context.Context, patient *doma
 	return args.Error(0)
 }
 
-func (m *mockSessionRepository) SearchPatientsByName(ctx context.Context, term string, pageSize int, page int) ([]*domain.Patient, error) {
-	args := m.Called(term)
+func (m *mockSessionRepository) SearchPatientsByName(ctx context.Context, input SearchPatientsByNameRepositoryInput) ([]*domain.Patient, error) {
+	args := m.Called(input)
 	return args.Get(0).([]*domain.Patient), args.Error(1)
 }

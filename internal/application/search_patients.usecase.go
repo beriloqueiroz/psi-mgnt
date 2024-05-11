@@ -17,7 +17,10 @@ func NewSearchPatientsUseCase(
 }
 
 type SearchPatientsInputDTO struct {
-	Term string `json:"term"`
+	Term     string `json:"term"`
+	PageSize int    `json:"page_size"`
+	Page     int    `json:"page"`
+	OwnerId  string `json:"owner_id"`
 }
 
 type SearchPatientsOutputDTO struct {
@@ -35,11 +38,25 @@ type PhoneOutputDTO struct {
 }
 
 func (u *SearchPatientsUseCase) Execute(ctx context.Context, input SearchPatientsInputDTO) ([]*SearchPatientsOutputDTO, error) {
-	dto := []*SearchPatientsOutputDTO{}
-	patients, err := u.SessionRepository.SearchPatientsByName(ctx, input.Term, 10, 0)
+	pageSizeParsed := 50
+	pageParsed := 1
+	if input.PageSize >= 0 {
+		pageSizeParsed = input.PageSize
+	}
+	if input.Page >= 1 {
+		pageParsed = input.Page
+	}
+	repoInput := SearchPatientsByNameRepositoryInput{
+		Term:     input.Term,
+		OwnerId:  input.OwnerId,
+		PageSize: pageSizeParsed,
+		Page:     pageParsed,
+	}
+	patients, err := u.SessionRepository.SearchPatientsByName(ctx, repoInput)
 	if err != nil {
 		return []*SearchPatientsOutputDTO{}, err
 	}
+	dto := []*SearchPatientsOutputDTO{}
 	for _, patient := range patients {
 		var phones []PhoneOutputDTO
 		for _, phone := range patient.Phones {

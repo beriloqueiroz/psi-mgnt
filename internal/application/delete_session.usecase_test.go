@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestDeleteSessionUseCase_Execute(t *testing.T) {
@@ -16,7 +17,7 @@ func TestDeleteSessionUseCase_Execute(t *testing.T) {
 		ID: "123",
 	}
 
-	mockRepo.On("Delete", input.ID).Return(nil)
+	mockRepo.On("Delete", mock.Anything).Return(nil)
 
 	output, err := useCase.Execute(context.Background(), input)
 

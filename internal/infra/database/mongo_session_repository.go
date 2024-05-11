@@ -6,6 +6,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/beriloqueiroz/psi-mgnt/internal/application"
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -77,19 +78,27 @@ func (mr *MongoSessionRepository) Create(ctx context.Context, session *domain.Se
 	}
 	return nil
 }
-func (mr *MongoSessionRepository) Delete(ctx context.Context, id string) error {
-	_, err := mr.SessionCollection.DeleteOne(ctx, bson.D{{Key: "id", Value: id}})
+func (mr *MongoSessionRepository) Delete(ctx context.Context, input application.DeleteRepositoryInput) error {
+	filter := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{"id", input.Id}},
+				bson.D{{"owner_id", input.OwnerId}},
+			}},
+	}
+	_, err := mr.SessionCollection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-func (mr *MongoSessionRepository) List(ctx context.Context, pageSize int, page int) ([]*domain.Session, error) {
-	findOptions := options.Find()
-	findOptions.SetLimit(int64(pageSize))
+func (mr *MongoSessionRepository) List(ctx context.Context, input application.ListRepositoryInput) ([]*domain.Session, error) {
+	l := int64(input.PageSize)
+	skip := int64(input.Page*input.PageSize - input.PageSize)
+	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
 
 	var results []*domain.Session
-	cur, err := mr.SessionCollection.Find(ctx, bson.D{{}}, findOptions)
+	cur, err := mr.SessionCollection.Find(ctx, bson.D{{Key: "owner_id", Value: input.OwnerId}}, &findOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +120,14 @@ func (mr *MongoSessionRepository) List(ctx context.Context, pageSize int, page i
 	cur.Close(ctx)
 	return results, nil
 }
-func (mr *MongoSessionRepository) FindPatientByName(ctx context.Context, name string) (*domain.Patient, error) {
-	filter := bson.D{{Key: "name", Value: name}}
+func (mr *MongoSessionRepository) FindPatientByName(ctx context.Context, input application.FindPatientByNameRepositoryInput) (*domain.Patient, error) {
+	filter := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{"name", input.Name}},
+				bson.D{{"owner_id", input.OwnerId}},
+			}},
+	}
 	var result domain.Patient
 	err := mr.PatientCollection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
@@ -130,16 +145,23 @@ func (mr *MongoSessionRepository) CreatePatient(ctx context.Context, patient *do
 	}
 	return nil
 }
-func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, term string, pageSize int, page int) ([]*domain.Patient, error) {
-	filter := bson.D{{Key: "name", Value: primitive.Regex{
-		Pattern: "/*" + term + ".*",
-		Options: "i",
-	}}}
-	findOptions := options.Find()
-	findOptions.SetLimit(int64(pageSize))
+func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, input application.SearchPatientsByNameRepositoryInput) ([]*domain.Patient, error) {
+	filter := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{Key: "name", Value: primitive.Regex{
+					Pattern: "/*" + input.Term + ".*",
+					Options: "i",
+				}}},
+				bson.D{{"owner_id", input.OwnerId}},
+			}},
+	}
+	l := int64(input.PageSize)
+	skip := int64(input.Page*input.PageSize - input.PageSize)
+	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
 
 	var results []*domain.Patient
-	cur, err := mr.PatientCollection.Find(ctx, filter, findOptions)
+	cur, err := mr.PatientCollection.Find(ctx, filter, &findOptions)
 	if err != nil {
 		return nil, err
 	}

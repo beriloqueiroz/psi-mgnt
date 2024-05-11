@@ -6,13 +6,14 @@ import (
 )
 
 type Session struct {
-	ID          string
-	Price       float64
-	Notes       string
-	Date        time.Time
-	PaymentDate time.Time
-	Duration    time.Duration
-	Patient     *Patient
+	ID          string        `bson:"id"`
+	Price       float64       `bson:"price"`
+	Notes       string        `bson:"notes"`
+	Date        time.Time     `bson:"date"`
+	PaymentDate time.Time     `bson:"payment_date"`
+	Duration    time.Duration `bson:"duration"`
+	Patient     *Patient      `bson:"patient"`
+	OwnerId     string        `bson:"owner_id"`
 }
 
 func NewSession(
@@ -23,6 +24,7 @@ func NewSession(
 	paymentDate time.Time,
 	duration time.Duration,
 	patient *Patient,
+	ownerId string,
 ) (*Session, error) {
 	session := &Session{
 		ID:          id,
@@ -32,6 +34,7 @@ func NewSession(
 		PaymentDate: paymentDate,
 		Duration:    duration,
 		Patient:     patient,
+		OwnerId:     ownerId,
 	}
 	err := session.IsValid()
 	if err != nil {
@@ -51,7 +54,10 @@ func (s *Session) IsValid() error {
 		return errors.New("invalid duration")
 	}
 	if len(s.Notes) <= 4 {
-		return errors.New("invalid duration")
+		return errors.New("invalid notes")
+	}
+	if s.OwnerId == "" {
+		return errors.New("invalid owner")
 	}
 	return nil
 }

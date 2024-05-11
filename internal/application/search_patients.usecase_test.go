@@ -31,10 +31,13 @@ func TestSearchPatientsUseCase_Execute(t *testing.T) {
 	}
 
 	input := SearchPatientsInputDTO{
-		Term: "Ali",
+		Term:     "Ali",
+		PageSize: 0,
+		Page:     0,
+		OwnerId:  "123",
 	}
 
-	mockRepo.On("SearchPatientsByName", input.Term, mock.Anything, mock.Anything).Return(patients, nil)
+	mockRepo.On("SearchPatientsByName", mock.Anything).Return(patients, nil)
 
 	output, err := usecase.Execute(context.Background(), input)
 
