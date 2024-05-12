@@ -305,7 +305,7 @@ func TestSearchPatientsByTermName(t *testing.T) {
 	assert.Equal(t, patient3.Name, founds[0].Name)
 }
 
-func TestListPatientsByTermName(t *testing.T) {
+func TestListSessions(t *testing.T) {
 	before()
 	defer after()
 	patient1, err := domain.NewPatient(

@@ -42,7 +42,11 @@ func main() {
 	deleteSessionUseCase := application.NewDeleteSessionUseCase(sessionRepository)
 	deleteSessionRoute := routes.NewDeleteSessionRoute(*deleteSessionUseCase)
 
+	listSessionsUsecase := application.NewListSessionsUseCase(sessionRepository)
+	listSessionRoute := routes.NewListSessionsRoute(*listSessionsUsecase)
+
 	server.AddRoute("POST /", createSessionRoute.Handler)
+	server.AddRoute("GET /", listSessionRoute.Handler)
 	server.AddRoute("DELETE /{id}", deleteSessionRoute.Handler)
 	server.AddRoute("GET /patient", searchPatientsRoute.Handler)
 

@@ -59,8 +59,8 @@ func TestListSessionsUseCase_Execute(t *testing.T) {
 	}
 
 	input := ListSessionsInputDto{
-		PageSize: 0,
-		Page:     0,
+		PageSize: 10,
+		Page:     1,
 		OwnerId:  "123",
 	}
 
