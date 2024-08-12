@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Sessão</title>
+</head>
+<body>
+<h1>Cadastro de Sessão</h1>
+<form action="/session" method="POST">
+    <label for="paciente_nome">Nome do Paciente:</label>
+    <input type="text" id="paciente_nome" name="paciente_nome" required><br>
+
+    <label for="preco">Preço:</label>
+    <input type="number" id="preco" name="preco" value="25"><br>
+
+    <label for="paciente_telefone">Telefone:</label>
+    <input type="text" id="paciente_telefone" name="paciente_telefone"><br>
+
+    <label for="duracao">Duração:</label>
+    <input type="text" id="duracao" name="duracao" required value="50m"><br>
+
+    <label for="data_hora">Data e Hora da Sessão:</label>
+    <input type="datetime-local" id="data_hora" name="data_hora" required><br>
+
+    <label for="notas">Notas:</label>
+    <textarea id="notas" name="notas"></textarea><br>
+
+    <input type="text" hidden="hidden" id="dono" name="dono" required value="12654785"><br>
+
+    <button type="submit">Cadastrar Sessão</button>
+</form>
+</body>
+</html>

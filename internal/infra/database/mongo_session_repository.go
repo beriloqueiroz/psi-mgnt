@@ -72,6 +72,7 @@ func connectToMongoDb(uri string, ctx context.Context) (*mongo.Client, error) {
 }
 
 func (mr *MongoSessionRepository) Create(ctx context.Context, session *domain.Session) error {
+	fmt.Println(session)
 	_, err := mr.SessionCollection.InsertOne(ctx, session)
 	if err != nil {
 		return err

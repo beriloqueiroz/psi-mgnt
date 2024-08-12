@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	routes_view "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes"
 
 	"github.com/beriloqueiroz/psi-mgnt/config"
 	"github.com/beriloqueiroz/psi-mgnt/internal/application"
@@ -45,10 +46,19 @@ func main() {
 	listSessionsUsecase := application.NewListSessionsUseCase(sessionRepository)
 	listSessionRoute := routes.NewListSessionsRoute(*listSessionsUsecase)
 
-	server.AddRoute("POST /", createSessionRoute.Handler)
-	server.AddRoute("GET /", listSessionRoute.Handler)
-	server.AddRoute("DELETE /{id}", deleteSessionRoute.Handler)
-	server.AddRoute("GET /patient", searchPatientsRoute.Handler)
+	server.AddRoute("POST /api", createSessionRoute.Handler)
+	server.AddRoute("GET /api", listSessionRoute.Handler)
+	server.AddRoute("DELETE /api/{id}", deleteSessionRoute.Handler)
+	server.AddRoute("GET /api/patient", searchPatientsRoute.Handler)
+
+	// views
+	createSessionRouteView := routes_view.NewCreateSessionRouteView(*createSessionUseCase)
+	server.AddRoute("GET /session", createSessionRouteView.HandlerGet)
+	server.AddRoute("POST /session", createSessionRouteView.HandlerPost)
+
+	listSessionRouteView := routes_view.NewListSessionRouteView(*listSessionsUsecase, *deleteSessionUseCase)
+	server.AddRoute("GET /sessions/{ownerId}", listSessionRouteView.HandlerGet)
+	server.AddRoute("POST /sessions/{ownerId}/{id}", listSessionRouteView.HandlerPost)
 
 	fmt.Println("Starting web server on port", configs.WebServerPort)
 	server.Start()

@@ -14,6 +14,7 @@ type Session struct {
 	Duration    time.Duration `bson:"duration"`
 	Patient     *Patient      `bson:"patient"`
 	OwnerId     string        `bson:"owner_id"`
+	Plan        string        `bson:"plan"`
 }
 
 func NewSession(
@@ -21,20 +22,20 @@ func NewSession(
 	price float64,
 	notes string,
 	date time.Time,
-	paymentDate time.Time,
 	duration time.Duration,
 	patient *Patient,
+	plan string,
 	ownerId string,
 ) (*Session, error) {
 	session := &Session{
-		ID:          id,
-		Price:       price,
-		Notes:       notes,
-		Date:        date,
-		PaymentDate: paymentDate,
-		Duration:    duration,
-		Patient:     patient,
-		OwnerId:     ownerId,
+		ID:       id,
+		Price:    price,
+		Notes:    notes,
+		Date:     date,
+		Duration: duration,
+		Patient:  patient,
+		OwnerId:  ownerId,
+		Plan:     plan,
 	}
 	err := session.IsValid()
 	if err != nil {

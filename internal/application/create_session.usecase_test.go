@@ -21,7 +21,6 @@ func TestCreateSessionUseCase_Execute(t *testing.T) {
 		Price:       100,
 		Notes:       "Test notes",
 		Date:        time.Now(),
-		PaymentDate: time.Now(),
 		Duration:    30 * time.Minute,
 		PatientName: "John Doe",
 		OwnerId:     "123",
@@ -42,7 +41,6 @@ func TestCreateSessionUseCase_Execute(t *testing.T) {
 	assert.Equal(t, input.Price, output.Price)
 	assert.Equal(t, input.Notes, output.Notes)
 	assert.Equal(t, input.Date, output.Date)
-	assert.Equal(t, input.PaymentDate, output.PaymentDate)
 	assert.Equal(t, input.Duration, output.Duration)
 	assert.Equal(t, input.PatientName, output.PatientName)
 	mockRepo.AssertNumberOfCalls(t, "Create", 1)
@@ -60,7 +58,6 @@ func TestCreateSessionUseCase_Execute_NewPatient(t *testing.T) {
 		Price:       100,
 		Notes:       "Test notes",
 		Date:        time.Now(),
-		PaymentDate: time.Now(),
 		Duration:    30 * time.Minute,
 		PatientName: "John Doe",
 		OwnerId:     "123",
@@ -79,7 +76,6 @@ func TestCreateSessionUseCase_Execute_NewPatient(t *testing.T) {
 	assert.Equal(t, input.Price, output.Price)
 	assert.Equal(t, input.Notes, output.Notes)
 	assert.Equal(t, input.Date, output.Date)
-	assert.Equal(t, input.PaymentDate, output.PaymentDate)
 	assert.Equal(t, input.Duration, output.Duration)
 	assert.Equal(t, input.PatientName, output.PatientName)
 	mockRepo.AssertNumberOfCalls(t, "CreatePatient", 1)
@@ -98,7 +94,6 @@ func TestCreateSessionUseCase_Execute_FindPatientError(t *testing.T) {
 		Price:       100,
 		Notes:       "Test notes",
 		Date:        time.Now(),
-		PaymentDate: time.Now(),
 		Duration:    30 * time.Minute,
 		PatientName: "John Doe",
 		OwnerId:     "123",

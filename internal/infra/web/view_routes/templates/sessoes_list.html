@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Sessões</title>
+</head>
+<body>
+<h1>Lista de Sessões</h1>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Paciente</th>
+        <th>Data e Hora</th>
+        <th>Notas</th>
+        <th>Plano</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range .}}
+    <tr>
+        <td>{{.ID}}</td>
+        <td>{{.PatientName}}</td>
+        <td>{{.Date}}</td>
+        <td>{{.Notes}}</td>
+        <td>{{.Plan}}</td>
+        <td>
+            <form action="/sessions/{{.OwnerId}}/{{.ID}}" method="POST">
+                <input type="hidden" name="id" value="{{.ID}}">
+                <button type="submit">Deletar</button>
+            </form>
+        </td>
+    </tr>
+    {{else}}
+    <tr>
+        <td colspan="5">Nenhuma sessão cadastrada.</td>
+    </tr>
+    {{end}}
+    </tbody>
+</table>
+</body>
+</html>

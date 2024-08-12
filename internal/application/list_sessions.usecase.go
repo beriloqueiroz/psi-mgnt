@@ -28,9 +28,10 @@ type ListSessionsOutputDto struct {
 	Price       float64       `json:"price"`
 	Notes       string        `json:"notes"`
 	Date        time.Time     `json:"date"`
-	PaymentDate time.Time     `json:"payment_date"`
 	Duration    time.Duration `json:"duration"`
 	PatientName string        `json:"patient_name"`
+	Plan        string        `json:"plan"`
+	OwnerId     string        `json:"owner_id"`
 }
 
 func (u *ListSessionsUseCase) Execute(ctx context.Context, input ListSessionsInputDto) ([]*ListSessionsOutputDto, error) {
@@ -58,9 +59,10 @@ func (u *ListSessionsUseCase) Execute(ctx context.Context, input ListSessionsInp
 			Price:       session.Price,
 			Notes:       session.Notes,
 			Date:        session.Date,
-			PaymentDate: session.PaymentDate,
 			Duration:    session.Duration,
 			PatientName: session.Patient.Name,
+			OwnerId:     input.OwnerId,
+			Plan:        session.Plan,
 		})
 	}
 	return dto, nil
