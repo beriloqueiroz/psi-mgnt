@@ -27,11 +27,9 @@ func (cr *ListSessionsRoute) Handler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		pageInt = 1
 	}
-	ownerId := r.URL.Query().Get("ownerId")
 	input := application.ListSessionsInputDto{
 		PageSize: pageSizeInt,
 		Page:     pageInt,
-		OwnerId:  ownerId,
 	}
 
 	output, err := cr.listSessionsUseCase.Execute(r.Context(), input)

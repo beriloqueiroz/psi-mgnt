@@ -33,13 +33,13 @@ type CreateSessionInputDTO struct {
 }
 
 type CreateSessionOutputDTO struct {
-	ID              string        `json:"id"`
-	Price           float64       `json:"price"`
-	Notes           string        `json:"notes"`
-	Date            time.Time     `json:"date"`
-	Duration        time.Duration `json:"duration"`
-	PatientName     string        `json:"patient_name"`
-	PrfessionalName string        `json:"prfessional_name"`
+	ID               string        `json:"id"`
+	Price            float64       `json:"price"`
+	Notes            string        `json:"notes"`
+	Date             time.Time     `json:"date"`
+	Duration         time.Duration `json:"duration"`
+	PatientName      string        `json:"patient_name"`
+	ProfessionalName string        `json:"professional_name"`
 }
 
 func (u *CreateSessionUseCase) Execute(ctx context.Context, input CreateSessionInputDTO) (CreateSessionOutputDTO, error) {
@@ -92,6 +92,6 @@ func (u *CreateSessionUseCase) Execute(ctx context.Context, input CreateSessionI
 	dto.Date = session.Date
 	dto.Duration = session.Duration
 	dto.PatientName = session.Patient.Name
-	dto.PrfessionalName = professional.Name
+	dto.ProfessionalName = professional.Name
 	return dto, nil
 }

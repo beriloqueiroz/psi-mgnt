@@ -17,8 +17,7 @@ func NewDeleteSessionUseCase(
 }
 
 type DeleteSessionInputDTO struct {
-	ID      string `json:"id"`
-	OwnerId string `json:"ownerId"`
+	ID string `json:"id"`
 }
 
 type DeleteSessionOutputDTO struct {
@@ -28,8 +27,7 @@ type DeleteSessionOutputDTO struct {
 func (u *DeleteSessionUseCase) Execute(ctx context.Context, input DeleteSessionInputDTO) (DeleteSessionOutputDTO, error) {
 	dto := DeleteSessionOutputDTO{}
 	inputRepo := DeleteRepositoryInput{
-		ProfessionalId: input.OwnerId,
-		SessionId:      input.ID,
+		SessionId: input.ID,
 	}
 	err := u.SessionRepository.Delete(ctx, inputRepo)
 	if err != nil {

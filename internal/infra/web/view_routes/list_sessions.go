@@ -33,11 +33,11 @@ func (cr *ListSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Reques
 		pageInt = 1
 		err = nil
 	}
-	ownerId := r.PathValue("ownerId")
+	professionalId := r.PathValue("professionalId")
 	input := application.ListSessionsInputDto{
-		PageSize: pageSizeInt,
-		Page:     pageInt,
-		OwnerId:  ownerId,
+		PageSize:       pageSizeInt,
+		Page:           pageInt,
+		ProfessionalId: professionalId,
 	}
 
 	output, err := cr.listSessionsUseCase.Execute(r.Context(), input)
@@ -48,7 +48,7 @@ func (cr *ListSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Reques
 		}{
 			Message: err.Error(),
 		}
-		http.Redirect(w, r, fmt.Sprintf("/sessions/%s?error_msg=%s", input.OwnerId, msg), http.StatusMovedPermanently)
+		http.Redirect(w, r, fmt.Sprintf("/sessions?error_msg=%s", msg), http.StatusMovedPermanently)
 		return
 	}
 
@@ -65,9 +65,8 @@ func (cr *ListSessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Reque
 
 	var err error
 	input.ID = r.PathValue("id")
-	input.OwnerId = r.PathValue("ownerId")
 
-	if input.ID == "" || input.OwnerId == "" {
+	if input.ID == "" {
 		err = errors.New("invalid id or ownerId")
 	}
 
@@ -77,7 +76,7 @@ func (cr *ListSessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Reque
 		}{
 			Message: err.Error(),
 		}
-		http.Redirect(w, r, fmt.Sprintf("/sessions/%s?error_msg=%s", input.OwnerId, msg), http.StatusMovedPermanently)
+		http.Redirect(w, r, fmt.Sprintf("/sessions?error_msg=%s", msg), http.StatusMovedPermanently)
 		return
 	}
 
@@ -90,10 +89,10 @@ func (cr *ListSessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Reque
 		}{
 			Message: err.Error(),
 		}
-		http.Redirect(w, r, fmt.Sprintf("/sessions/%s?error_msg=%s", input.OwnerId, msg), http.StatusMovedPermanently)
+		http.Redirect(w, r, fmt.Sprintf("/sessions/%s?error_msg=%s", msg), http.StatusMovedPermanently)
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("/sessions/%s?delete_success=true", input.OwnerId), http.StatusMovedPermanently)
+	http.Redirect(w, r, fmt.Sprintf("/sessions?delete_success=%s", "true"), http.StatusMovedPermanently)
 	return
 }

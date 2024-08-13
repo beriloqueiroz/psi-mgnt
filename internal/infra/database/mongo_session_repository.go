@@ -30,7 +30,7 @@ func NewMongoSessionRepository(ctx context.Context, uri string, patientCollectio
 	database := client.Database(databaseName)
 	initCollections(ctx, database, patientCollection, professionalCollection, sessionCollection)
 	PatientCollection := database.Collection(patientCollection)
-	ProfessionalCollection := database.Collection(patientCollection)
+	ProfessionalCollection := database.Collection(professionalCollection)
 	SessionCollection := database.Collection(sessionCollection)
 	return &MongoSessionRepository{
 		client,
@@ -233,7 +233,7 @@ func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, inpu
 	cur.Close(ctx)
 	return results, nil
 }
-func (mr *MongoSessionRepository) SearchProfessionalByName(ctx context.Context, input application.SearchProfessionalByNameRepositoryInput) ([]*domain.Professional, error) {
+func (mr *MongoSessionRepository) SearchProfessionalsByName(ctx context.Context, input application.SearchProfessionalByNameRepositoryInput) ([]*domain.Professional, error) {
 	filter := bson.D{
 		{"$and",
 			bson.A{
@@ -270,7 +270,13 @@ func (mr *MongoSessionRepository) SearchProfessionalByName(ctx context.Context, 
 	cur.Close(ctx)
 	return results, nil
 }
-
+func (mr *MongoSessionRepository) CreateProfessional(ctx context.Context, professional *domain.Professional) error {
+	_, err := mr.ProfessionalCollection.InsertOne(ctx, professional)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func Connect(uri string) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()

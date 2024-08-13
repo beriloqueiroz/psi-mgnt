@@ -52,4 +52,5 @@ type SessionRepositoryInterface interface {
 	SearchPatientsByName(ctx context.Context, input SearchPatientsByNameRepositoryInput) ([]*domain.Patient, error)
 	FindProfessional(ctx context.Context, input FindProfessionalRepositoryInput) (*domain.Professional, error)
 	SearchProfessionalsByName(ctx context.Context, input SearchProfessionalByNameRepositoryInput) ([]*domain.Professional, error)
+	CreateProfessional(ctx context.Context, professional *domain.Professional) error
 }

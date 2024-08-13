@@ -15,6 +15,7 @@
         <th>Data e Hora</th>
         <th>Notas</th>
         <th>Plano</th>
+        <th>Profissional</th>
     </tr>
     </thead>
     <tbody>
@@ -25,8 +26,9 @@
         <td>{{.Date}}</td>
         <td>{{.Notes}}</td>
         <td>{{.Plan}}</td>
+        <td>{{.ProfessionalName}}</td>
         <td>
-            <form action="/sessions/{{.OwnerId}}/{{.ID}}" method="POST">
+            <form action="/sessions/{{.ID}}" method="POST">
                 <input type="hidden" name="id" value="{{.ID}}">
                 <button type="submit">Deletar</button>
             </form>

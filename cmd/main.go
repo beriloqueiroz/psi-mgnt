@@ -29,12 +29,16 @@ func main() {
 		initCtx,
 		configs.DBUri,
 		configs.DBPatientCollection,
+		configs.DBProfessionalCollection,
 		configs.DBSessionCollection,
 		configs.DBDatabase)
 	if err != nil {
 		panic(err)
 	}
 	createSessionUseCase := application.NewCreateSessionUseCase(sessionRepository)
+
+	createProfessionalUseCase := application.NewCreateProfessionalUseCase(sessionRepository)
+
 	createSessionRoute := routes.NewCreateSessionRoute(*createSessionUseCase)
 
 	searchPatientsUseCase := application.NewSearchPatientsUseCase(sessionRepository)
@@ -56,9 +60,14 @@ func main() {
 	server.AddRoute("GET /session", createSessionRouteView.HandlerGet)
 	server.AddRoute("POST /session", createSessionRouteView.HandlerPost)
 
+	createProfessionalRouteView := routes_view.NewCreateProfessionalRouteView(*createProfessionalUseCase)
+
+	server.AddRoute("POST /professional", createProfessionalRouteView.HandlerPost)
+	server.AddRoute("GET /professional", createProfessionalRouteView.HandlerGet)
+
 	listSessionRouteView := routes_view.NewListSessionRouteView(*listSessionsUsecase, *deleteSessionUseCase)
-	server.AddRoute("GET /sessions/{ownerId}", listSessionRouteView.HandlerGet)
-	server.AddRoute("POST /sessions/{ownerId}/{id}", listSessionRouteView.HandlerPost)
+	server.AddRoute("GET /sessions", listSessionRouteView.HandlerGet)
+	server.AddRoute("POST /sessions/{id}", listSessionRouteView.HandlerPost)
 
 	fmt.Println("Starting web server on port", configs.WebServerPort)
 	server.Start()

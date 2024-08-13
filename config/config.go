@@ -3,11 +3,12 @@ package config
 import "github.com/spf13/viper"
 
 type conf struct {
-	DBUri               string `mapstructure:"DB_URI"`
-	DBDatabase          string `mapstructure:"DB_DATABASE"`
-	DBSessionCollection string `mapstructure:"DB_SESSION_COLLECTION"`
-	DBPatientCollection string `mapstructure:"DB_PATIENT_COLLECTION"`
-	WebServerPort       string `mapstructure:"WEB_SERVER_PORT"`
+	DBUri                    string `mapstructure:"DB_URI"`
+	DBDatabase               string `mapstructure:"DB_DATABASE"`
+	DBSessionCollection      string `mapstructure:"DB_SESSION_COLLECTION"`
+	DBPatientCollection      string `mapstructure:"DB_PATIENT_COLLECTION"`
+	DBProfessionalCollection string `mapstructure:"DB_PROFESSIONAL_COLLECTION"`
+	WebServerPort            string `mapstructure:"WEB_SERVER_PORT"`
 }
 
 func LoadConfig(paths []string) (*conf, error) {

@@ -562,3 +562,27 @@ func TestListSessions(t *testing.T) {
 	assert.Equal(t, session2.ID, founds[1].ID)
 	assert.Equal(t, session3.ID, founds[2].ID)
 }
+
+func TestCreateProfessional(t *testing.T) {
+	before()
+	defer after()
+	professionalId := uuid.New().String()
+	professional, err := domain.NewProfessional(
+		professionalId,
+		"berilo",
+		"12365478",
+		"berio@gmail.com",
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = mongoRepo.CreateProfessional(ctx, professional)
+
+	if err != nil {
+		panic(err)
+	}
+
+	assert.Nil(t, err)
+}

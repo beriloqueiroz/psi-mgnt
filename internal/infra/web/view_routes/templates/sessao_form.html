@@ -8,8 +8,11 @@
 <body>
 <h1>Cadastro de Sessão</h1>
 <form action="/session" method="POST">
-    <label for="paciente_nome">Nome do Paciente:</label>
+    <label for="paciente_nome">Paciente:</label>
     <input type="text" id="paciente_nome" name="paciente_nome" required><br>
+
+    <label for="profissional_nome">Profissional:</label>
+    <input type="text" id="profissional_nome" name="profissional_nome" required><br>
 
     <label for="preco">Preço:</label>
     <input type="number" id="preco" name="preco" value="25"><br>
@@ -26,7 +29,8 @@
     <label for="notas">Notas:</label>
     <textarea id="notas" name="notas"></textarea><br>
 
-    <input type="text" hidden="hidden" id="dono" name="dono" required value="12654785"><br>
+    <input type="text" hidden="hidden" id="profissional_id" name="profissional_id"><br>
+    <input type="text" hidden="hidden" id="paciente_id" name="paciente_id"><br>
 
     <button type="submit">Cadastrar Sessão</button>
 </form>

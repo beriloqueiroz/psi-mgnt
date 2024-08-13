@@ -61,3 +61,8 @@ func (m *mockSessionRepository) SearchProfessionalsByName(ctx context.Context, i
 	args := m.Called(input)
 	return args.Get(0).([]*domain.Professional), args.Error(1)
 }
+
+func (m *mockSessionRepository) CreateProfessional(ctx context.Context, professional *domain.Professional) error {
+	args := m.Called(professional)
+	return args.Error(0)
+}

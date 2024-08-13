@@ -68,6 +68,10 @@ func (u *ListSessionsUseCase) Execute(ctx context.Context, input ListSessionsInp
 	}
 	dto := []*ListSessionsOutputDto{}
 	for _, session := range sessions {
+		var profesionalName string
+		if session.Professional != nil {
+			profesionalName = session.Professional.Name
+		}
 		dto = append(dto, &ListSessionsOutputDto{
 			ID:               session.ID,
 			Price:            session.Price,
@@ -75,7 +79,7 @@ func (u *ListSessionsUseCase) Execute(ctx context.Context, input ListSessionsInp
 			Date:             session.Date,
 			Duration:         session.Duration,
 			PatientName:      session.Patient.Name,
-			ProfessionalName: session.Professional.Name,
+			ProfessionalName: profesionalName,
 			Plan:             session.Plan,
 		})
 	}
