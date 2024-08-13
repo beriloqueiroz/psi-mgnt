@@ -18,12 +18,11 @@ func TestListSessionsUseCase_Execute(t *testing.T) {
 
 	sessions := []*domain.Session{
 		{
-			ID:          uuid.New().String(),
-			Price:       12,
-			Notes:       "nota 1",
-			Date:        time.Now(),
-			PaymentDate: time.Now(),
-			Duration:    10,
+			ID:       uuid.New().String(),
+			Price:    12,
+			Notes:    "nota 1",
+			Date:     time.Now(),
+			Duration: 10,
 			Patient: &domain.Patient{
 				ID:   "123",
 				Name: "teste fulano",
@@ -34,12 +33,11 @@ func TestListSessionsUseCase_Execute(t *testing.T) {
 			},
 		},
 		{
-			ID:          uuid.New().String(),
-			Price:       12.5,
-			Notes:       "nota 2",
-			Date:        time.Now(),
-			PaymentDate: time.Now(),
-			Duration:    50,
+			ID:       uuid.New().String(),
+			Price:    12.5,
+			Notes:    "nota 2",
+			Date:     time.Now(),
+			Duration: 50,
 			Patient: &domain.Patient{
 				ID:   "123",
 				Name: "teste sicrano",
@@ -50,12 +48,11 @@ func TestListSessionsUseCase_Execute(t *testing.T) {
 			},
 		},
 		{
-			ID:          uuid.New().String(),
-			Price:       120,
-			Notes:       "nota 3",
-			Date:        time.Now(),
-			PaymentDate: time.Now(),
-			Duration:    100,
+			ID:       uuid.New().String(),
+			Price:    120,
+			Notes:    "nota 3",
+			Date:     time.Now(),
+			Duration: 100,
 			Patient: &domain.Patient{
 				ID:   "123",
 				Name: "teste fulano",
@@ -91,12 +88,11 @@ func TestListSessionsUseCase_WhenProfessional_Execute(t *testing.T) {
 
 	sessions := []*domain.Session{
 		{
-			ID:          uuid.New().String(),
-			Price:       12,
-			Notes:       "nota 1",
-			Date:        time.Now(),
-			PaymentDate: time.Now(),
-			Duration:    10,
+			ID:       uuid.New().String(),
+			Price:    12,
+			Notes:    "nota 1",
+			Date:     time.Now(),
+			Duration: 10,
 			Patient: &domain.Patient{
 				ID:   "123",
 				Name: "teste fulano",
@@ -107,12 +103,11 @@ func TestListSessionsUseCase_WhenProfessional_Execute(t *testing.T) {
 			},
 		},
 		{
-			ID:          uuid.New().String(),
-			Price:       12.5,
-			Notes:       "nota 2",
-			Date:        time.Now(),
-			PaymentDate: time.Now(),
-			Duration:    50,
+			ID:       uuid.New().String(),
+			Price:    12.5,
+			Notes:    "nota 2",
+			Date:     time.Now(),
+			Duration: 50,
 			Patient: &domain.Patient{
 				ID:   "123",
 				Name: "teste sicrano",
@@ -123,12 +118,11 @@ func TestListSessionsUseCase_WhenProfessional_Execute(t *testing.T) {
 			},
 		},
 		{
-			ID:          uuid.New().String(),
-			Price:       120,
-			Notes:       "nota 3",
-			Date:        time.Now(),
-			PaymentDate: time.Now(),
-			Duration:    100,
+			ID:       uuid.New().String(),
+			Price:    120,
+			Notes:    "nota 3",
+			Date:     time.Now(),
+			Duration: 100,
 			Patient: &domain.Patient{
 				ID:   "123",
 				Name: "teste fulano",

@@ -31,10 +31,9 @@ type FindProfessionalRepositoryInput struct {
 }
 
 type SearchPatientsByNameRepositoryInput struct {
-	Term           string
-	ProfessionalId string
-	PageSize       int
-	Page           int
+	Term     string
+	PageSize int
+	Page     int
 }
 
 type SearchProfessionalByNameRepositoryInput struct {

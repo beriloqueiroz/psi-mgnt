@@ -10,7 +10,6 @@ type Session struct {
 	Price        float64       `bson:"price"`
 	Notes        string        `bson:"notes"`
 	Date         time.Time     `bson:"date"`
-	PaymentDate  time.Time     `bson:"payment_date"`
 	Duration     time.Duration `bson:"duration"`
 	Patient      *Patient      `bson:"patient"`
 	Professional *Professional `bson:"professional"`
