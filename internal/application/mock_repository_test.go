@@ -21,6 +21,11 @@ func (m *mockSessionRepository) Delete(ctx context.Context, input DeleteReposito
 	return args.Error(0)
 }
 
+func (m *mockSessionRepository) ListByProfessional(ctx context.Context, input ListByProfessionalRepositoryInput) ([]*domain.Session, error) {
+	args := m.Called(input)
+	return args.Get(0).([]*domain.Session), args.Error(1)
+}
+
 func (m *mockSessionRepository) List(ctx context.Context, input ListRepositoryInput) ([]*domain.Session, error) {
 	args := m.Called(input)
 	return args.Get(0).([]*domain.Session), args.Error(1)

@@ -129,7 +129,7 @@ func TestCreateSession_WhenPatientNotExist(t *testing.T) {
 		panic(err)
 	}
 
-	inputList := application.ListRepositoryInput{
+	inputList := application.ListByProfessionalRepositoryInput{
 		ProfessionalId: "123",
 		PageSize:       10,
 		Page:           1,
@@ -347,7 +347,7 @@ func TestListSessions(t *testing.T) {
 		panic(err)
 	}
 
-	inputList := application.ListRepositoryInput{
+	inputList := application.ListByProfessionalRepositoryInput{
 		ProfessionalId: "123",
 		PageSize:       10,
 		Page:           1,
@@ -408,7 +408,7 @@ func TestDeleteSession(t *testing.T) {
 		panic(err)
 	}
 
-	inputList := application.ListRepositoryInput{
+	inputList := application.ListByProfessionalRepositoryInput{
 		ProfessionalId: "123",
 		PageSize:       10,
 		Page:           1,

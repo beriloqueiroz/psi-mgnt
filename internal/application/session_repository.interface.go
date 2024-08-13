@@ -6,10 +6,15 @@ import (
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
 )
 
-type ListRepositoryInput struct {
+type ListByProfessionalRepositoryInput struct {
 	ProfessionalId string
 	PageSize       int
 	Page           int
+}
+
+type ListRepositoryInput struct {
+	PageSize int
+	Page     int
 }
 
 type DeleteRepositoryInput struct {
@@ -41,6 +46,7 @@ type SearchProfessionalByNameRepositoryInput struct {
 type SessionRepositoryInterface interface {
 	Create(ctx context.Context, session *domain.Session) error
 	Delete(ctx context.Context, input DeleteRepositoryInput) error
+	ListByProfessional(ctx context.Context, input ListByProfessionalRepositoryInput) ([]*domain.Session, error)
 	List(ctx context.Context, input ListRepositoryInput) ([]*domain.Session, error)
 	FindPatient(ctx context.Context, input FindPatientRepositoryInput) (*domain.Patient, error)
 	CreatePatient(ctx context.Context, patient *domain.Patient) error

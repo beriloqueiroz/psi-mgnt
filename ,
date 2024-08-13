@@ -1,5 +1,5 @@
 deploy guiche prod
-nova versão: staging-556
+nova versão: staging-557
 rollback: staging-555
 resumo: 
   BSN-1311 Inserir informações da norma ANTT 6033 no BPe

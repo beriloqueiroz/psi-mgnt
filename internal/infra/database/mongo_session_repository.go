@@ -93,7 +93,7 @@ func (mr *MongoSessionRepository) Delete(ctx context.Context, input application.
 	}
 	return nil
 }
-func (mr *MongoSessionRepository) List(ctx context.Context, input application.ListRepositoryInput) ([]*domain.Session, error) {
+func (mr *MongoSessionRepository) List(ctx context.Context, input application.ListByProfessionalRepositoryInput) ([]*domain.Session, error) {
 	l := int64(input.PageSize)
 	skip := int64(input.Page*input.PageSize - input.PageSize)
 	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
