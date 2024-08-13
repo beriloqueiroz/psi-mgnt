@@ -28,8 +28,8 @@ type DeleteSessionOutputDTO struct {
 func (u *DeleteSessionUseCase) Execute(ctx context.Context, input DeleteSessionInputDTO) (DeleteSessionOutputDTO, error) {
 	dto := DeleteSessionOutputDTO{}
 	inputRepo := DeleteRepositoryInput{
-		OwnerId: input.OwnerId,
-		Id:      input.ID,
+		ProfessionalId: input.OwnerId,
+		SessionId:      input.ID,
 	}
 	err := u.SessionRepository.Delete(ctx, inputRepo)
 	if err != nil {

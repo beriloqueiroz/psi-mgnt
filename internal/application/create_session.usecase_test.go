@@ -7,7 +7,6 @@ import (
 	"time"
 
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -18,20 +17,26 @@ func TestCreateSessionUseCase_Execute(t *testing.T) {
 	useCase := NewCreateSessionUseCase(mockRepo)
 
 	input := CreateSessionInputDTO{
-		Price:       100,
-		Notes:       "Test notes",
-		Date:        time.Now(),
-		Duration:    30 * time.Minute,
-		PatientName: "John Doe",
-		OwnerId:     "123",
+		Price:          100,
+		Notes:          "Test notes",
+		Date:           time.Now(),
+		Duration:       30 * time.Minute,
+		PatientName:    "Patient Name",
+		PatientId:      "123",
+		ProfessionalId: "123",
 	}
 
 	existingPatient := &domain.Patient{
-		ID:   uuid.New().String(),
+		ID:   "123",
 		Name: "John Doe",
 	}
-	mockRepo.On("FindPatientByName", mock.Anything).Return(existingPatient, nil)
 
+	existingProfessional := &domain.Professional{
+		ID:   "123",
+		Name: "John Doe Prof",
+	}
+	mockRepo.On("FindPatient", mock.Anything).Return(existingPatient, nil)
+	mockRepo.On("FindProfessional", mock.Anything).Return(existingProfessional, nil)
 	mockRepo.On("Create", mock.Anything).Return(nil)
 
 	output, err := useCase.Execute(context.Background(), input)
@@ -42,9 +47,8 @@ func TestCreateSessionUseCase_Execute(t *testing.T) {
 	assert.Equal(t, input.Notes, output.Notes)
 	assert.Equal(t, input.Date, output.Date)
 	assert.Equal(t, input.Duration, output.Duration)
-	assert.Equal(t, input.PatientName, output.PatientName)
 	mockRepo.AssertNumberOfCalls(t, "Create", 1)
-	mockRepo.AssertNumberOfCalls(t, "FindPatientByName", 1)
+	mockRepo.AssertNumberOfCalls(t, "FindPatient", 1)
 
 	mockRepo.AssertExpectations(t)
 }
@@ -55,19 +59,24 @@ func TestCreateSessionUseCase_Execute_NewPatient(t *testing.T) {
 	useCase := NewCreateSessionUseCase(mockRepo)
 
 	input := CreateSessionInputDTO{
-		Price:       100,
-		Notes:       "Test notes",
-		Date:        time.Now(),
-		Duration:    30 * time.Minute,
-		PatientName: "John Doe",
-		OwnerId:     "123",
+		Price:          100,
+		Notes:          "Test notes",
+		Date:           time.Now(),
+		Duration:       30 * time.Minute,
+		PatientName:    "John Doe",
+		PatientId:      "123",
+		ProfessionalId: "123",
 	}
 
-	mockRepo.On("FindPatientByName", mock.Anything).Return(nil, nil)
+	existingProfessional := &domain.Professional{
+		ID:   "123",
+		Name: "John Doe Prof",
+	}
 
+	mockRepo.On("FindPatient", mock.Anything).Return(nil, nil)
 	mockRepo.On("CreatePatient", mock.Anything).Return(nil)
-
 	mockRepo.On("Create", mock.Anything).Return(nil)
+	mockRepo.On("FindProfessional", mock.Anything).Return(existingProfessional, nil)
 
 	output, err := useCase.Execute(context.Background(), input)
 
@@ -77,10 +86,9 @@ func TestCreateSessionUseCase_Execute_NewPatient(t *testing.T) {
 	assert.Equal(t, input.Notes, output.Notes)
 	assert.Equal(t, input.Date, output.Date)
 	assert.Equal(t, input.Duration, output.Duration)
-	assert.Equal(t, input.PatientName, output.PatientName)
 	mockRepo.AssertNumberOfCalls(t, "CreatePatient", 1)
 	mockRepo.AssertNumberOfCalls(t, "Create", 1)
-	mockRepo.AssertNumberOfCalls(t, "FindPatientByName", 1)
+	mockRepo.AssertNumberOfCalls(t, "FindPatient", 1)
 
 	mockRepo.AssertExpectations(t)
 }
@@ -91,20 +99,20 @@ func TestCreateSessionUseCase_Execute_FindPatientError(t *testing.T) {
 	useCase := NewCreateSessionUseCase(mockRepo)
 
 	input := CreateSessionInputDTO{
-		Price:       100,
-		Notes:       "Test notes",
-		Date:        time.Now(),
-		Duration:    30 * time.Minute,
-		PatientName: "John Doe",
-		OwnerId:     "123",
+		Price:          100,
+		Notes:          "Test notes",
+		Date:           time.Now(),
+		Duration:       30 * time.Minute,
+		PatientName:    "John Doe",
+		PatientId:      "123",
+		ProfessionalId: "123",
 	}
 
-	inputRepo := FindPatientByNameRepositoryInput{
-		OwnerId: "123",
-		Name:    input.PatientName,
+	inputRepo := FindPatientRepositoryInput{
+		PatientId: "123",
 	}
 
-	mockRepo.On("FindPatientByName", inputRepo).Return(&domain.Patient{}, errors.New("something went wrong"))
+	mockRepo.On("FindPatient", inputRepo).Return(&domain.Patient{}, errors.New("something went wrong"))
 
 	_, err := useCase.Execute(context.Background(), input)
 
@@ -112,6 +120,6 @@ func TestCreateSessionUseCase_Execute_FindPatientError(t *testing.T) {
 
 	mockRepo.AssertNumberOfCalls(t, "CreatePatient", 0)
 	mockRepo.AssertNumberOfCalls(t, "Create", 0)
-	mockRepo.AssertNumberOfCalls(t, "FindPatientByName", 1)
+	mockRepo.AssertNumberOfCalls(t, "FindPatient", 1)
 	mockRepo.AssertExpectations(t)
 }

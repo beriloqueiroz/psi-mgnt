@@ -44,9 +44,9 @@ func (u *ListSessionsUseCase) Execute(ctx context.Context, input ListSessionsInp
 		pageParsed = input.Page
 	}
 	repoInput := ListRepositoryInput{
-		OwnerId:  input.OwnerId,
-		PageSize: pageSizeParsed,
-		Page:     pageParsed,
+		ProfessionalId: input.OwnerId,
+		PageSize:       pageSizeParsed,
+		Page:           pageParsed,
 	}
 	sessions, err := u.SessionRepository.List(ctx, repoInput)
 	if err != nil {

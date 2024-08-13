@@ -6,15 +6,15 @@ import (
 )
 
 type Session struct {
-	ID          string        `bson:"id"`
-	Price       float64       `bson:"price"`
-	Notes       string        `bson:"notes"`
-	Date        time.Time     `bson:"date"`
-	PaymentDate time.Time     `bson:"payment_date"`
-	Duration    time.Duration `bson:"duration"`
-	Patient     *Patient      `bson:"patient"`
-	OwnerId     string        `bson:"owner_id"`
-	Plan        string        `bson:"plan"`
+	ID           string        `bson:"id"`
+	Price        float64       `bson:"price"`
+	Notes        string        `bson:"notes"`
+	Date         time.Time     `bson:"date"`
+	PaymentDate  time.Time     `bson:"payment_date"`
+	Duration     time.Duration `bson:"duration"`
+	Patient      *Patient      `bson:"patient"`
+	Professional *Professional `bson:"professional"`
+	Plan         string        `bson:"plan"`
 }
 
 func NewSession(
@@ -25,17 +25,17 @@ func NewSession(
 	duration time.Duration,
 	patient *Patient,
 	plan string,
-	ownerId string,
+	professional *Professional,
 ) (*Session, error) {
 	session := &Session{
-		ID:       id,
-		Price:    price,
-		Notes:    notes,
-		Date:     date,
-		Duration: duration,
-		Patient:  patient,
-		OwnerId:  ownerId,
-		Plan:     plan,
+		ID:           id,
+		Price:        price,
+		Notes:        notes,
+		Date:         date,
+		Duration:     duration,
+		Patient:      patient,
+		Professional: professional,
+		Plan:         plan,
 	}
 	err := session.IsValid()
 	if err != nil {
@@ -57,8 +57,8 @@ func (s *Session) IsValid() error {
 	if len(s.Notes) <= 4 {
 		return errors.New("invalid notes")
 	}
-	if s.OwnerId == "" {
-		return errors.New("invalid owner")
+	if s.Professional == nil {
+		return errors.New("invalid professional")
 	}
 	return nil
 }

@@ -20,7 +20,6 @@ type SearchPatientsInputDTO struct {
 	Term     string `json:"term"`
 	PageSize int    `json:"page_size"`
 	Page     int    `json:"page"`
-	OwnerId  string `json:"owner_id"`
 }
 
 type SearchPatientsOutputDTO struct {
@@ -48,7 +47,6 @@ func (u *SearchPatientsUseCase) Execute(ctx context.Context, input SearchPatient
 	}
 	repoInput := SearchPatientsByNameRepositoryInput{
 		Term:     input.Term,
-		OwnerId:  input.OwnerId,
 		PageSize: pageSizeParsed,
 		Page:     pageParsed,
 	}

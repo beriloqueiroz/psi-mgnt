@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
@@ -21,45 +22,63 @@ func NewCreateSessionUseCase(
 }
 
 type CreateSessionInputDTO struct {
-	Price       float64       `json:"price"`
-	Notes       string        `json:"notes"`
-	Date        time.Time     `json:"date"`
-	Duration    time.Duration `json:"duration"`
-	PatientName string        `json:"patient_name"`
-	OwnerId     string        `json:"owner_id"`
-	Plan        string        `json:"plan"`
+	Price          float64       `json:"price"`
+	Notes          string        `json:"notes"`
+	Date           time.Time     `json:"date"`
+	Duration       time.Duration `json:"duration"`
+	PatientId      string        `json:"patient_id"`
+	PatientName    string        `json:"patient_name"`
+	ProfessionalId string        `json:"professional_id"`
+	Plan           string        `json:"plan"`
 }
 
 type CreateSessionOutputDTO struct {
-	ID          string        `json:"id"`
-	Price       float64       `json:"price"`
-	Notes       string        `json:"notes"`
-	Date        time.Time     `json:"date"`
-	Duration    time.Duration `json:"duration"`
-	PatientName string        `json:"patient_name"`
+	ID              string        `json:"id"`
+	Price           float64       `json:"price"`
+	Notes           string        `json:"notes"`
+	Date            time.Time     `json:"date"`
+	Duration        time.Duration `json:"duration"`
+	PatientName     string        `json:"patient_name"`
+	PrfessionalName string        `json:"prfessional_name"`
 }
 
 func (u *CreateSessionUseCase) Execute(ctx context.Context, input CreateSessionInputDTO) (CreateSessionOutputDTO, error) {
 	dto := CreateSessionOutputDTO{}
-	inputRepo := FindPatientByNameRepositoryInput{
-		Name:    input.PatientName,
-		OwnerId: input.OwnerId,
+	inputRepo := FindPatientRepositoryInput{
+		PatientId: input.PatientId,
 	}
-	patient, err := u.SessionRepository.FindPatientByName(ctx, inputRepo)
+	var patient *domain.Patient
+	var err error
+	if input.PatientId != "" {
+		patient, err = u.SessionRepository.FindPatient(ctx, inputRepo)
+		if err != nil {
+			return dto, err
+		}
+	}
+
+	if patient == nil {
+		patient, err = domain.NewPatient(uuid.New().String(), input.PatientName, "", "", []domain.Phone{})
+		if err != nil {
+			return dto, err
+		}
+		err = u.SessionRepository.CreatePatient(ctx, patient)
+		if err != nil {
+			return dto, err
+		}
+	}
+
+	inputRepoProf := FindProfessionalRepositoryInput{
+		ProfessionalId: input.ProfessionalId,
+	}
+	professional, err := u.SessionRepository.FindProfessional(ctx, inputRepoProf)
 	if err != nil {
 		return dto, err
 	}
-	if patient == nil {
-		patient, err = domain.NewPatient(uuid.New().String(), input.PatientName, "", "", []domain.Phone{}, input.OwnerId)
-		if err != nil {
-			return dto, err
-		}
-		err := u.SessionRepository.CreatePatient(ctx, patient)
-		if err != nil {
-			return dto, err
-		}
+	if professional == nil {
+		return dto, errors.New("professional does not exist")
 	}
-	session, err := domain.NewSession(uuid.New().String(), input.Price, input.Notes, input.Date, input.Duration, patient, input.Plan, input.OwnerId)
+
+	session, err := domain.NewSession(uuid.New().String(), input.Price, input.Notes, input.Date, input.Duration, patient, input.Plan, professional)
 	if err != nil {
 		return dto, err
 	}
@@ -73,5 +92,6 @@ func (u *CreateSessionUseCase) Execute(ctx context.Context, input CreateSessionI
 	dto.Date = session.Date
 	dto.Duration = session.Duration
 	dto.PatientName = session.Patient.Name
+	dto.PrfessionalName = professional.Name
 	return dto, nil
 }

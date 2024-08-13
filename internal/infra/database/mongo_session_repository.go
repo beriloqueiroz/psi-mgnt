@@ -83,8 +83,8 @@ func (mr *MongoSessionRepository) Delete(ctx context.Context, input application.
 	filter := bson.D{
 		{"$and",
 			bson.A{
-				bson.D{{"id", input.Id}},
-				bson.D{{"owner_id", input.OwnerId}},
+				bson.D{{"id", input.SessionId}},
+				bson.D{{"owner_id", input.ProfessionalId}},
 			}},
 	}
 	_, err := mr.SessionCollection.DeleteOne(ctx, filter)
@@ -99,7 +99,7 @@ func (mr *MongoSessionRepository) List(ctx context.Context, input application.Li
 	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
 
 	var results []*domain.Session
-	cur, err := mr.SessionCollection.Find(ctx, bson.D{{Key: "owner_id", Value: input.OwnerId}}, &findOptions)
+	cur, err := mr.SessionCollection.Find(ctx, bson.D{{Key: "owner_id", Value: input.ProfessionalId}}, &findOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -121,12 +121,12 @@ func (mr *MongoSessionRepository) List(ctx context.Context, input application.Li
 	cur.Close(ctx)
 	return results, nil
 }
-func (mr *MongoSessionRepository) FindPatientByName(ctx context.Context, input application.FindPatientByNameRepositoryInput) (*domain.Patient, error) {
+func (mr *MongoSessionRepository) FindPatientByName(ctx context.Context, input application.FindPatientRepositoryInput) (*domain.Patient, error) {
 	filter := bson.D{
 		{"$and",
 			bson.A{
 				bson.D{{"name", input.Name}},
-				bson.D{{"owner_id", input.OwnerId}},
+				bson.D{{"owner_id", input.ProfessionalId}},
 			}},
 	}
 	var result domain.Patient
@@ -154,7 +154,7 @@ func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, inpu
 					Pattern: "/*" + input.Term + ".*",
 					Options: "i",
 				}}},
-				bson.D{{"owner_id", input.OwnerId}},
+				bson.D{{"owner_id", input.ProfessionalId}},
 			}},
 	}
 	l := int64(input.PageSize)

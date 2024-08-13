@@ -25,9 +25,8 @@ func TestListSessionsUseCase_Execute(t *testing.T) {
 			PaymentDate: time.Now(),
 			Duration:    10,
 			Patient: &domain.Patient{
-				ID:      "123",
-				Name:    "teste fulano",
-				OwnerId: "123",
+				ID:   "123",
+				Name: "teste fulano",
 			},
 		},
 		{
@@ -38,9 +37,8 @@ func TestListSessionsUseCase_Execute(t *testing.T) {
 			PaymentDate: time.Now(),
 			Duration:    50,
 			Patient: &domain.Patient{
-				ID:      "123",
-				Name:    "teste sicrano",
-				OwnerId: "123",
+				ID:   "123",
+				Name: "teste sicrano",
 			},
 		},
 		{
@@ -51,9 +49,8 @@ func TestListSessionsUseCase_Execute(t *testing.T) {
 			PaymentDate: time.Now(),
 			Duration:    100,
 			Patient: &domain.Patient{
-				ID:      "123",
-				Name:    "teste fulano",
-				OwnerId: "123",
+				ID:   "123",
+				Name: "teste fulano",
 			},
 		},
 	}

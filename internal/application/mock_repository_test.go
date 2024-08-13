@@ -26,7 +26,7 @@ func (m *mockSessionRepository) List(ctx context.Context, input ListRepositoryIn
 	return args.Get(0).([]*domain.Session), args.Error(1)
 }
 
-func (m *mockSessionRepository) FindPatientByName(ctx context.Context, input FindPatientByNameRepositoryInput) (*domain.Patient, error) {
+func (m *mockSessionRepository) FindPatient(ctx context.Context, input FindPatientRepositoryInput) (*domain.Patient, error) {
 	args := m.Called(input)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -42,4 +42,17 @@ func (m *mockSessionRepository) CreatePatient(ctx context.Context, patient *doma
 func (m *mockSessionRepository) SearchPatientsByName(ctx context.Context, input SearchPatientsByNameRepositoryInput) ([]*domain.Patient, error) {
 	args := m.Called(input)
 	return args.Get(0).([]*domain.Patient), args.Error(1)
+}
+
+func (m *mockSessionRepository) FindProfessional(ctx context.Context, input FindProfessionalRepositoryInput) (*domain.Professional, error) {
+	args := m.Called(input)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.Professional), args.Error(1)
+}
+
+func (m *mockSessionRepository) SearchProfessionalsByName(ctx context.Context, input SearchProfessionalByNameRepositoryInput) ([]*domain.Professional, error) {
+	args := m.Called(input)
+	return args.Get(0).([]*domain.Professional), args.Error(1)
 }

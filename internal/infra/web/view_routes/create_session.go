@@ -34,12 +34,12 @@ func (cr *CreateSessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Req
 	fmt.Println(r.FormValue("data_hora"))
 	fmt.Println(r.FormValue("duracao"))
 
-	input.PatientName = r.FormValue("paciente_nome")
+	input.PatientId = r.FormValue("paciente_nome")
 	input.Date, err = time.Parse("2006-01-02T15:04", r.FormValue("data_hora"))
 	input.Notes = r.FormValue("notas")
 	input.Duration, err = time.ParseDuration(r.FormValue("duracao"))
 	input.Price, err = strconv.ParseFloat(r.FormValue("preco"), 64)
-	input.OwnerId = r.FormValue("dono")
+	input.ProfessionalId = r.FormValue("dono")
 
 	if err != nil {
 		msg := struct {
@@ -47,7 +47,7 @@ func (cr *CreateSessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Req
 		}{
 			Message: err.Error(),
 		}
-		http.Redirect(w, r, fmt.Sprintf("/sessions/%s?error_msg=%s", input.OwnerId, msg), http.StatusMovedPermanently)
+		http.Redirect(w, r, fmt.Sprintf("/sessions/%s?error_msg=%s", input.ProfessionalId, msg), http.StatusMovedPermanently)
 		return
 	}
 
@@ -61,9 +61,9 @@ func (cr *CreateSessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Req
 		}{
 			Message: err.Error(),
 		}
-		http.Redirect(w, r, fmt.Sprintf("/sessions/%s?error_msg=%s", input.OwnerId, msg), http.StatusMovedPermanently)
+		http.Redirect(w, r, fmt.Sprintf("/sessions/%s?error_msg=%s", input.ProfessionalId, msg), http.StatusMovedPermanently)
 		return
 	}
 
-	http.Redirect(w, r, "/sessions/"+input.OwnerId+"?created_success=true", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/sessions/"+input.ProfessionalId+"?created_success=true", http.StatusMovedPermanently)
 }

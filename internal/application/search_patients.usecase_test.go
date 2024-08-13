@@ -34,7 +34,6 @@ func TestSearchPatientsUseCase_Execute(t *testing.T) {
 		Term:     "Ali",
 		PageSize: 0,
 		Page:     0,
-		OwnerId:  "123",
 	}
 
 	mockRepo.On("SearchPatientsByName", mock.Anything).Return(patients, nil)

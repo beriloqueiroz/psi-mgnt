@@ -84,9 +84,9 @@ func TestCreateSession_WhenPatientAlreadyExist(t *testing.T) {
 		panic(err)
 	}
 
-	found, err := mongoRepo.FindPatientByName(ctx, application.FindPatientByNameRepositoryInput{
-		OwnerId: "123",
-		Name:    "berilo",
+	found, err := mongoRepo.FindPatientByName(ctx, application.FindPatientRepositoryInput{
+		ProfessionalId: "123",
+		Name:           "berilo",
 	})
 
 	if err != nil {
@@ -130,9 +130,9 @@ func TestCreateSession_WhenPatientNotExist(t *testing.T) {
 	}
 
 	inputList := application.ListRepositoryInput{
-		OwnerId:  "123",
-		PageSize: 10,
-		Page:     1,
+		ProfessionalId: "123",
+		PageSize:       10,
+		Page:           1,
 	}
 
 	list, err := mongoRepo.List(ctx, inputList)
@@ -145,7 +145,7 @@ func TestCreateSession_WhenPatientNotExist(t *testing.T) {
 	assert.NotNil(t, list)
 	assert.Equal(t, session.ID, list[0].ID)
 	assert.Equal(t, session.Notes, list[0].Notes)
-	assert.Equal(t, session.OwnerId, list[0].OwnerId)
+	assert.Equal(t, session.Professional, list[0].Professional)
 }
 
 func TestFindPatientByName(t *testing.T) {
@@ -185,9 +185,9 @@ func TestFindPatientByName(t *testing.T) {
 		panic(err)
 	}
 
-	input := application.FindPatientByNameRepositoryInput{
-		OwnerId: "1234",
-		Name:    "berilo",
+	input := application.FindPatientRepositoryInput{
+		ProfessionalId: "1234",
+		Name:           "berilo",
 	}
 
 	found, err := mongoRepo.FindPatientByName(ctx, input)
@@ -266,10 +266,10 @@ func TestSearchPatientsByTermName(t *testing.T) {
 	}
 
 	inputSearch := application.SearchPatientsByNameRepositoryInput{
-		OwnerId:  "123",
-		PageSize: 10,
-		Page:     1,
-		Term:     "berilo",
+		ProfessionalId: "123",
+		PageSize:       10,
+		Page:           1,
+		Term:           "berilo",
 	}
 
 	founds, err := mongoRepo.SearchPatientsByName(ctx, inputSearch)
@@ -287,10 +287,10 @@ func TestSearchPatientsByTermName(t *testing.T) {
 	assert.Equal(t, patient2.OwnerId, founds[1].OwnerId)
 
 	inputSearch = application.SearchPatientsByNameRepositoryInput{
-		OwnerId:  "123",
-		PageSize: 10,
-		Page:     1,
-		Term:     "é",
+		ProfessionalId: "123",
+		PageSize:       10,
+		Page:           1,
+		Term:           "é",
 	}
 
 	founds, err = mongoRepo.SearchPatientsByName(ctx, inputSearch)
@@ -348,9 +348,9 @@ func TestListSessions(t *testing.T) {
 	}
 
 	inputList := application.ListRepositoryInput{
-		OwnerId:  "123",
-		PageSize: 10,
-		Page:     1,
+		ProfessionalId: "123",
+		PageSize:       10,
+		Page:           1,
 	}
 	founds, err := mongoRepo.List(ctx, inputList)
 
@@ -409,9 +409,9 @@ func TestDeleteSession(t *testing.T) {
 	}
 
 	inputList := application.ListRepositoryInput{
-		OwnerId:  "123",
-		PageSize: 10,
-		Page:     1,
+		ProfessionalId: "123",
+		PageSize:       10,
+		Page:           1,
 	}
 
 	founds, err := mongoRepo.List(ctx, inputList)
@@ -428,8 +428,8 @@ func TestDeleteSession(t *testing.T) {
 	assert.Equal(t, session3.ID, founds[2].ID)
 
 	input := application.DeleteRepositoryInput{
-		OwnerId: session2.OwnerId,
-		Id:      session2.ID,
+		ProfessionalId: session2.Professional,
+		SessionId:      session2.ID,
 	}
 
 	err = mongoRepo.Delete(ctx, input)
