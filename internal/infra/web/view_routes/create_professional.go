@@ -3,7 +3,7 @@ package routes_view
 import (
 	"fmt"
 	"github.com/beriloqueiroz/psi-mgnt/internal/application"
-	"html/template"
+	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes/components"
 	"net/http"
 )
 
@@ -16,9 +16,10 @@ func NewCreateProfessionalRouteView(createProfessionalUseCase application.Create
 }
 
 func (cr *CreateProfessionalRouteView) HandlerGet(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("internal/infra/web/view_routes/templates/profissional_form.html"))
-	err := tmpl.Execute(w, nil)
+	h := components.ProfessionalForm()
+	err := h.Render(r.Context(), w)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
 }

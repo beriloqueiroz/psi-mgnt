@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Sessão</title>
-</head>
-<body>
+{{define "content"}}
 <h1>Cadastro de Sessão</h1>
 <form action="/session" method="POST">
     <label for="paciente_nome">Paciente:</label>
@@ -34,5 +27,4 @@
 
     <button type="submit">Cadastrar Sessão</button>
 </form>
-</body>
-</html>
+{{end}}

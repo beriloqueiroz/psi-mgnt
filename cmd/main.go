@@ -3,14 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	routes_view "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes"
-
 	"github.com/beriloqueiroz/psi-mgnt/config"
 	"github.com/beriloqueiroz/psi-mgnt/internal/application"
 	infra "github.com/beriloqueiroz/psi-mgnt/internal/infra/database"
 	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/routes"
 	webserver "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/server"
-
+	routes_view "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes"
 	// mysql
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -68,6 +66,8 @@ func main() {
 	listSessionRouteView := routes_view.NewListSessionRouteView(*listSessionsUsecase, *deleteSessionUseCase)
 	server.AddRoute("GET /sessions", listSessionRouteView.HandlerGet)
 	server.AddRoute("POST /sessions/{id}", listSessionRouteView.HandlerPost)
+
+	server.AddRoute("GET /", routes_view.NewHomeRouteView().HandlerGet)
 
 	fmt.Println("Starting web server on port", configs.WebServerPort)
 	server.Start()

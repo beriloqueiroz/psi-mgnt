@@ -1,7 +1,0 @@
-deploy guiche prod
-nova versão: staging-557
-rollback: staging-555
-resumo: 
-  BSN-1311 Inserir informações da norma ANTT 6033 no BPe
-  BSN-1310 Criar trava no cadastro de WL/Parceiro estratégico da rodoviária
-  BSN-1297 Inserir logs para identificar causa de erro na atualização do gateway

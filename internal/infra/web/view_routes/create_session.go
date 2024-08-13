@@ -2,7 +2,6 @@ package routes_view
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 	"time"
@@ -19,8 +18,11 @@ func NewCreateSessionRouteView(createSessionUseCase application.CreateSessionUse
 }
 
 func (cr *CreateSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("internal/infra/web/view_routes/templates/sessao_form.html"))
-	err := tmpl.Execute(w, nil)
+	tmpl, err := GetBaseFormTemplates("sessao_form.html")
+	if err != nil {
+		return
+	}
+	err = tmpl.ExecuteTemplate(w, "base", nil)
 	if err != nil {
 		return
 	}
