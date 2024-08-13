@@ -15,37 +15,44 @@ import (
 )
 
 type MongoSessionRepository struct {
-	Client            *mongo.Client
-	PatientCollection *mongo.Collection
-	SessionCollection *mongo.Collection
+	Client                 *mongo.Client
+	PatientCollection      *mongo.Collection
+	ProfessionalCollection *mongo.Collection
+	SessionCollection      *mongo.Collection
 }
 
-func NewMongoSessionRepository(
-	ctx context.Context, uri string,
-	patientCollection string, sessionCollection string,
-	databaseName string) (*MongoSessionRepository, error) {
+func NewMongoSessionRepository(ctx context.Context, uri string, patientCollection string, professionalCollection string,
+	sessionCollection string, databaseName string) (*MongoSessionRepository, error) {
 	client, err := connectToMongoDb(uri, ctx)
 	if err != nil {
 		return nil, err
 	}
 	database := client.Database(databaseName)
-	initCollections(ctx, database, patientCollection, sessionCollection)
+	initCollections(ctx, database, patientCollection, professionalCollection, sessionCollection)
 	PatientCollection := database.Collection(patientCollection)
+	ProfessionalCollection := database.Collection(patientCollection)
 	SessionCollection := database.Collection(sessionCollection)
 	return &MongoSessionRepository{
 		client,
 		PatientCollection,
+		ProfessionalCollection,
 		SessionCollection,
 	}, nil
 }
 
-func initCollections(ctx context.Context, database *mongo.Database, patientCollection string, sessionCollection string) error {
+func initCollections(ctx context.Context, database *mongo.Database, patientCollection string, professionalCollection string, sessionCollection string) error {
 	result, err := database.ListCollectionNames(ctx, bson.D{{}})
 	if err != nil {
 		return err
 	}
 	if !slices.Contains(result, patientCollection) {
 		err = database.CreateCollection(ctx, patientCollection)
+		if err != nil {
+			return err
+		}
+	}
+	if !slices.Contains(result, professionalCollection) {
+		err = database.CreateCollection(ctx, professionalCollection)
 		if err != nil {
 			return err
 		}
@@ -84,7 +91,6 @@ func (mr *MongoSessionRepository) Delete(ctx context.Context, input application.
 		{"$and",
 			bson.A{
 				bson.D{{"id", input.SessionId}},
-				bson.D{{"owner_id", input.ProfessionalId}},
 			}},
 	}
 	_, err := mr.SessionCollection.DeleteOne(ctx, filter)
@@ -93,13 +99,13 @@ func (mr *MongoSessionRepository) Delete(ctx context.Context, input application.
 	}
 	return nil
 }
-func (mr *MongoSessionRepository) List(ctx context.Context, input application.ListByProfessionalRepositoryInput) ([]*domain.Session, error) {
+func (mr *MongoSessionRepository) ListByProfessional(ctx context.Context, input application.ListByProfessionalRepositoryInput) ([]*domain.Session, error) {
 	l := int64(input.PageSize)
 	skip := int64(input.Page*input.PageSize - input.PageSize)
 	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
 
 	var results []*domain.Session
-	cur, err := mr.SessionCollection.Find(ctx, bson.D{{Key: "owner_id", Value: input.ProfessionalId}}, &findOptions)
+	cur, err := mr.SessionCollection.Find(ctx, bson.D{{Key: "professional.id", Value: input.ProfessionalId}}, &findOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -121,16 +127,60 @@ func (mr *MongoSessionRepository) List(ctx context.Context, input application.Li
 	cur.Close(ctx)
 	return results, nil
 }
-func (mr *MongoSessionRepository) FindPatientByName(ctx context.Context, input application.FindPatientRepositoryInput) (*domain.Patient, error) {
+func (mr *MongoSessionRepository) List(ctx context.Context, input application.ListRepositoryInput) ([]*domain.Session, error) {
+	l := int64(input.PageSize)
+	skip := int64(input.Page*input.PageSize - input.PageSize)
+	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
+
+	var results []*domain.Session
+	cur, err := mr.SessionCollection.Find(ctx, bson.D{}, &findOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var elem domain.Session
+		err := cur.Decode(&elem)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, &elem)
+	}
+
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+
+	cur.Close(ctx)
+	return results, nil
+}
+func (mr *MongoSessionRepository) FindPatient(ctx context.Context, input application.FindPatientRepositoryInput) (*domain.Patient, error) {
 	filter := bson.D{
 		{"$and",
 			bson.A{
-				bson.D{{"name", input.Name}},
-				bson.D{{"owner_id", input.ProfessionalId}},
+				bson.D{{"id", input.PatientId}},
 			}},
 	}
 	var result domain.Patient
 	err := mr.PatientCollection.FindOne(ctx, filter).Decode(&result)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &result, nil
+}
+func (mr *MongoSessionRepository) FindProfessional(ctx context.Context, input application.FindProfessionalRepositoryInput) (*domain.Professional, error) {
+	filter := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{"id", input.ProfessionalId}},
+			}},
+	}
+	var result domain.Professional
+	err := mr.ProfessionalCollection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
@@ -154,7 +204,6 @@ func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, inpu
 					Pattern: "/*" + input.Term + ".*",
 					Options: "i",
 				}}},
-				bson.D{{"owner_id", input.ProfessionalId}},
 			}},
 	}
 	l := int64(input.PageSize)
@@ -169,6 +218,43 @@ func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, inpu
 
 	for cur.Next(ctx) {
 		var elem domain.Patient
+		err := cur.Decode(&elem)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, &elem)
+	}
+
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+
+	cur.Close(ctx)
+	return results, nil
+}
+func (mr *MongoSessionRepository) SearchProfessionalByName(ctx context.Context, input application.SearchProfessionalByNameRepositoryInput) ([]*domain.Professional, error) {
+	filter := bson.D{
+		{"$and",
+			bson.A{
+				bson.D{{Key: "name", Value: primitive.Regex{
+					Pattern: "/*" + input.Term + ".*",
+					Options: "i",
+				}}},
+			}},
+	}
+	l := int64(input.PageSize)
+	skip := int64(input.Page*input.PageSize - input.PageSize)
+	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
+
+	var results []*domain.Professional
+	cur, err := mr.ProfessionalCollection.Find(ctx, filter, &findOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	for cur.Next(ctx) {
+		var elem domain.Professional
 		err := cur.Decode(&elem)
 		if err != nil {
 			return nil, err

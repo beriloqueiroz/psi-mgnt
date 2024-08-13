@@ -28,6 +28,7 @@ func before() {
 		ctx,
 		"mongodb://root:example@localhost:27017",
 		"patients",
+		"professionals",
 		"sessions",
 		"psimgnt_test",
 	)
@@ -51,13 +52,13 @@ func clear() {
 func TestCreateSession_WhenPatientAlreadyExist(t *testing.T) {
 	before()
 	defer after()
+	patientId := uuid.New().String()
 	patient, err := domain.NewPatient(
-		uuid.NewString(),
+		patientId,
 		"berilo",
 		"12365478",
 		"",
 		[]domain.Phone{},
-		"123",
 	)
 
 	if err != nil {
@@ -70,9 +71,28 @@ func TestCreateSession_WhenPatientAlreadyExist(t *testing.T) {
 		panic(err)
 	}
 
+	professional, err := domain.NewProfessional(
+		uuid.NewString(),
+		"berilo",
+		"12365478",
+		"",
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
 	id := uuid.NewString()
 
-	session, err := domain.NewSession(id, 100, "notes de doido", time.Now(), time.Now(), time.Hour, patient, "123")
+	session, err := domain.NewSession(
+		id,
+		100,
+		"notes de doido",
+		time.Now(),
+		time.Hour,
+		patient,
+		"unimed",
+		professional)
 
 	if err != nil {
 		panic(err)
@@ -84,9 +104,8 @@ func TestCreateSession_WhenPatientAlreadyExist(t *testing.T) {
 		panic(err)
 	}
 
-	found, err := mongoRepo.FindPatientByName(ctx, application.FindPatientRepositoryInput{
-		ProfessionalId: "123",
-		Name:           "berilo",
+	found, err := mongoRepo.FindPatient(ctx, application.FindPatientRepositoryInput{
+		PatientId: patientId,
 	})
 
 	if err != nil {
@@ -96,19 +115,30 @@ func TestCreateSession_WhenPatientAlreadyExist(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, found)
 	assert.Equal(t, session.Patient.ID, found.ID)
-	assert.Equal(t, patient.OwnerId, found.OwnerId)
 }
 
 func TestCreateSession_WhenPatientNotExist(t *testing.T) {
 	before()
 	defer after()
+	patientId := uuid.New().String()
 	patient, err := domain.NewPatient(
-		uuid.NewString(),
+		patientId,
 		"berilo",
 		"12365478",
 		"",
 		[]domain.Phone{},
-		"123",
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	professionalId := uuid.New().String()
+	professional, err := domain.NewProfessional(
+		professionalId,
+		"berilo",
+		"12365478",
+		"",
 	)
 
 	if err != nil {
@@ -117,7 +147,7 @@ func TestCreateSession_WhenPatientNotExist(t *testing.T) {
 
 	id := uuid.NewString()
 
-	session, err := domain.NewSession(id, 100, "notes de doido", time.Now(), time.Now(), time.Hour, patient, "123")
+	session, err := domain.NewSession(id, 100, "notes de doido", time.Now(), time.Hour, patient, "unimed", professional)
 
 	if err != nil {
 		panic(err)
@@ -130,12 +160,12 @@ func TestCreateSession_WhenPatientNotExist(t *testing.T) {
 	}
 
 	inputList := application.ListByProfessionalRepositoryInput{
-		ProfessionalId: "123",
+		ProfessionalId: professionalId,
 		PageSize:       10,
 		Page:           1,
 	}
 
-	list, err := mongoRepo.List(ctx, inputList)
+	list, err := mongoRepo.ListByProfessional(ctx, inputList)
 
 	if err != nil {
 		panic(err)
@@ -148,25 +178,25 @@ func TestCreateSession_WhenPatientNotExist(t *testing.T) {
 	assert.Equal(t, session.Professional, list[0].Professional)
 }
 
-func TestFindPatientByName(t *testing.T) {
+func TestFindPatient(t *testing.T) {
 	before()
 	defer after()
+	patientId1 := uuid.NewString()
+	patientId2 := uuid.NewString()
 	patient1, err := domain.NewPatient(
-		uuid.NewString(),
+		patientId1,
 		"berilo",
 		"12365478",
 		"",
 		[]domain.Phone{},
-		"123",
 	)
 
 	patient2, err := domain.NewPatient(
-		uuid.NewString(),
+		patientId2,
 		"berilo",
 		"12365478",
 		"",
 		[]domain.Phone{},
-		"1234",
 	)
 
 	if err != nil {
@@ -186,11 +216,10 @@ func TestFindPatientByName(t *testing.T) {
 	}
 
 	input := application.FindPatientRepositoryInput{
-		ProfessionalId: "1234",
-		Name:           "berilo",
+		PatientId: patientId2,
 	}
 
-	found, err := mongoRepo.FindPatientByName(ctx, input)
+	found, err := mongoRepo.FindPatient(ctx, input)
 
 	if err != nil {
 		panic(err)
@@ -199,7 +228,6 @@ func TestFindPatientByName(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, found)
 	assert.Equal(t, patient2.Name, found.Name)
-	assert.Equal(t, patient2.OwnerId, found.OwnerId)
 }
 
 func TestSearchPatientsByTermName(t *testing.T) {
@@ -211,7 +239,6 @@ func TestSearchPatientsByTermName(t *testing.T) {
 		"12365478",
 		"",
 		[]domain.Phone{},
-		"123",
 	)
 	if err != nil {
 		panic(err)
@@ -222,26 +249,23 @@ func TestSearchPatientsByTermName(t *testing.T) {
 		"12365478",
 		"",
 		[]domain.Phone{},
-		"123",
 	)
-	patientNotOwner, err := domain.NewPatient(
+	patient3, err := domain.NewPatient(
 		uuid.NewString(),
 		"berilo grande",
 		"12365478",
 		"",
 		[]domain.Phone{},
-		"1234",
 	)
 	if err != nil {
 		panic(err)
 	}
-	patient3, err := domain.NewPatient(
+	patient4, err := domain.NewPatient(
 		uuid.NewString(),
 		"não é ",
 		"12365478",
 		"",
 		[]domain.Phone{},
-		"123",
 	)
 
 	if err != nil {
@@ -260,16 +284,15 @@ func TestSearchPatientsByTermName(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	err = mongoRepo.CreatePatient(ctx, patientNotOwner)
+	err = mongoRepo.CreatePatient(ctx, patient4)
 	if err != nil {
 		panic(err)
 	}
 
 	inputSearch := application.SearchPatientsByNameRepositoryInput{
-		ProfessionalId: "123",
-		PageSize:       10,
-		Page:           1,
-		Term:           "berilo",
+		PageSize: 10,
+		Page:     1,
+		Term:     "berilo",
 	}
 
 	founds, err := mongoRepo.SearchPatientsByName(ctx, inputSearch)
@@ -280,17 +303,15 @@ func TestSearchPatientsByTermName(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, founds)
-	assert.Equal(t, len(founds), 2)
+	assert.Equal(t, 3, len(founds))
 	assert.Equal(t, patient1.Name, founds[0].Name)
-	assert.Equal(t, patient1.OwnerId, founds[0].OwnerId)
 	assert.Equal(t, patient2.Name, founds[1].Name)
-	assert.Equal(t, patient2.OwnerId, founds[1].OwnerId)
+	assert.Equal(t, patient3.Name, founds[2].Name)
 
 	inputSearch = application.SearchPatientsByNameRepositoryInput{
-		ProfessionalId: "123",
-		PageSize:       10,
-		Page:           1,
-		Term:           "é",
+		PageSize: 10,
+		Page:     1,
+		Term:     "é",
 	}
 
 	founds, err = mongoRepo.SearchPatientsByName(ctx, inputSearch)
@@ -302,10 +323,10 @@ func TestSearchPatientsByTermName(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, founds)
 	assert.Equal(t, len(founds), 1)
-	assert.Equal(t, patient3.Name, founds[0].Name)
+	assert.Equal(t, patient4.Name, founds[0].Name)
 }
 
-func TestListSessions(t *testing.T) {
+func TestListByProfessionalSessions(t *testing.T) {
 	before()
 	defer after()
 	patient1, err := domain.NewPatient(
@@ -314,21 +335,32 @@ func TestListSessions(t *testing.T) {
 		"12365478",
 		"",
 		[]domain.Phone{},
-		"123",
 	)
 	if err != nil {
 		panic(err)
 	}
 
-	session1, err := domain.NewSession(uuid.NewString(), 100, "notes de doido", time.Now(), time.Now(), time.Hour, patient1, "123")
+	professionalId := uuid.New().String()
+	professional, err := domain.NewProfessional(
+		professionalId,
+		"berilo",
+		"12365478",
+		"",
+	)
+
 	if err != nil {
 		panic(err)
 	}
-	session2, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 1", time.Now(), time.Now(), time.Hour, patient1, "123")
+
+	session1, err := domain.NewSession(uuid.NewString(), 100, "notes de doido", time.Now(), time.Hour, patient1, "unimed", professional)
 	if err != nil {
 		panic(err)
 	}
-	session3, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 2", time.Now(), time.Now(), time.Hour, patient1, "123")
+	session2, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 1", time.Now(), time.Hour, patient1, "unimed", professional)
+	if err != nil {
+		panic(err)
+	}
+	session3, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 2", time.Now(), time.Hour, patient1, "unimed", professional)
 	if err != nil {
 		panic(err)
 	}
@@ -348,11 +380,11 @@ func TestListSessions(t *testing.T) {
 	}
 
 	inputList := application.ListByProfessionalRepositoryInput{
-		ProfessionalId: "123",
+		ProfessionalId: professionalId,
 		PageSize:       10,
 		Page:           1,
 	}
-	founds, err := mongoRepo.List(ctx, inputList)
+	founds, err := mongoRepo.ListByProfessional(ctx, inputList)
 
 	if err != nil {
 		panic(err)
@@ -375,21 +407,32 @@ func TestDeleteSession(t *testing.T) {
 		"12365478",
 		"",
 		[]domain.Phone{},
-		"123",
 	)
 	if err != nil {
 		panic(err)
 	}
 
-	session1, err := domain.NewSession(uuid.NewString(), 100, "notes de doido", time.Now(), time.Now(), time.Hour, patient1, "123")
+	professionalId := uuid.New().String()
+	professional, err := domain.NewProfessional(
+		professionalId,
+		"berilo",
+		"12365478",
+		"",
+	)
+
 	if err != nil {
 		panic(err)
 	}
-	session2, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 1", time.Now(), time.Now(), time.Hour, patient1, "123")
+
+	session1, err := domain.NewSession(uuid.NewString(), 100, "notes de doido", time.Now(), time.Hour, patient1, "unimed", professional)
 	if err != nil {
 		panic(err)
 	}
-	session3, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 2", time.Now(), time.Now(), time.Hour, patient1, "123")
+	session2, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 1", time.Now(), time.Hour, patient1, "unimed", professional)
+	if err != nil {
+		panic(err)
+	}
+	session3, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 2", time.Now(), time.Hour, patient1, "unimed", professional)
 	if err != nil {
 		panic(err)
 	}
@@ -409,12 +452,12 @@ func TestDeleteSession(t *testing.T) {
 	}
 
 	inputList := application.ListByProfessionalRepositoryInput{
-		ProfessionalId: "123",
+		ProfessionalId: professionalId,
 		PageSize:       10,
 		Page:           1,
 	}
 
-	founds, err := mongoRepo.List(ctx, inputList)
+	founds, err := mongoRepo.ListByProfessional(ctx, inputList)
 
 	if err != nil {
 		panic(err)
@@ -428,8 +471,7 @@ func TestDeleteSession(t *testing.T) {
 	assert.Equal(t, session3.ID, founds[2].ID)
 
 	input := application.DeleteRepositoryInput{
-		ProfessionalId: session2.Professional,
-		SessionId:      session2.ID,
+		SessionId: session2.ID,
 	}
 
 	err = mongoRepo.Delete(ctx, input)
@@ -438,7 +480,7 @@ func TestDeleteSession(t *testing.T) {
 		panic(err)
 	}
 
-	founds, err = mongoRepo.List(ctx, inputList)
+	founds, err = mongoRepo.ListByProfessional(ctx, inputList)
 
 	if err != nil {
 		panic(err)
@@ -449,5 +491,74 @@ func TestDeleteSession(t *testing.T) {
 	assert.Equal(t, len(founds), 2)
 	assert.Equal(t, session1.ID, founds[0].ID)
 	assert.Equal(t, session3.ID, founds[1].ID)
+}
 
+func TestListSessions(t *testing.T) {
+	before()
+	defer after()
+	patient1, err := domain.NewPatient(
+		uuid.NewString(),
+		"berilo jose",
+		"12365478",
+		"",
+		[]domain.Phone{},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	professional, err := domain.NewProfessional(
+		uuid.NewString(),
+		"berilo",
+		"12365478",
+		"",
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	session1, err := domain.NewSession(uuid.NewString(), 100, "notes de doido", time.Now(), time.Hour, patient1, "unimed", professional)
+	if err != nil {
+		panic(err)
+	}
+	session2, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 1", time.Now(), time.Hour, patient1, "unimed", professional)
+	if err != nil {
+		panic(err)
+	}
+	session3, err := domain.NewSession(uuid.NewString(), 100, "notes de doido 2", time.Now(), time.Hour, patient1, "unimed", professional)
+	if err != nil {
+		panic(err)
+	}
+
+	err = mongoRepo.Create(ctx, session1)
+	if err != nil {
+		panic(err)
+	}
+	err = mongoRepo.Create(ctx, session2)
+	if err != nil {
+		panic(err)
+	}
+	err = mongoRepo.Create(ctx, session3)
+
+	if err != nil {
+		panic(err)
+	}
+
+	inputList := application.ListRepositoryInput{
+		PageSize: 10,
+		Page:     1,
+	}
+	founds, err := mongoRepo.List(ctx, inputList)
+
+	if err != nil {
+		panic(err)
+	}
+
+	assert.Nil(t, err)
+	assert.NotNil(t, founds)
+	assert.Equal(t, len(founds), 3)
+	assert.Equal(t, session1.ID, founds[0].ID)
+	assert.Equal(t, session2.ID, founds[1].ID)
+	assert.Equal(t, session3.ID, founds[2].ID)
 }
