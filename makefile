@@ -15,7 +15,6 @@ build:
 # and compiles the project whenever a file is changed.
 dev:
 	npx tailwindcss build -i static/css/style.css -o static/css/tailwind.css -m &\
-	templ generate --watch --cmd="go generate cmd/main.go" &\
 	templ generate --watch --cmd="go run cmd/main.go"
 
 clean:

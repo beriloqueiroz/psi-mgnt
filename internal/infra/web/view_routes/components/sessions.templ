@@ -1,0 +1,48 @@
+package components
+
+import "github.com/beriloqueiroz/psi-mgnt/internal/application"
+
+templ SessionsForm(items []*application.ListSessionsOutputDto) {
+    @Layout(sessionsForm(items))
+}
+
+templ sessionsForm(items []*application.ListSessionsOutputDto) {
+    <main class="mx-auto">
+    <h1>Lista de Sessões</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Paciente</th>
+            <th>Data e Hora</th>
+            <th>Plano</th>
+            <th>Profissional</th>
+        </tr>
+        </thead>
+        <tbody>
+        for _, item := range items {
+            <tr>
+                <td>{item.ID}</td>
+                <td>{item.PatientName}</td>
+                <td>{item.Date.Format("02/Jan/2006 15:04:05 ")}</td>
+                <td>{item.Plan}</td>
+                <td>{item.ProfessionalName}</td>
+                <td class="min-w-32">
+                    <form action={templ.SafeURL("/sessions/"+item.ID)} method="POST" class="m-auto text-center w-fit flex flex-col justify-center">
+                        <div class="mx-auto">
+                            <input type="hidden" name="id" value={item.ID}>
+                            @ButtonDel("excluir","submit")
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        }
+        if len(items) == 0 {
+            <tr>
+                <td colspan="5">Nenhuma sessão cadastrada.</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    </main>
+}

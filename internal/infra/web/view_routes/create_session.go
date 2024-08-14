@@ -2,6 +2,7 @@ package routes_view
 
 import (
 	"fmt"
+	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes/components"
 	"net/http"
 	"strconv"
 	"time"
@@ -18,12 +19,10 @@ func NewCreateSessionRouteView(createSessionUseCase application.CreateSessionUse
 }
 
 func (cr *CreateSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := GetBaseFormTemplates("sessao_form.html")
+	h := components.SessionForm()
+	err := h.Render(r.Context(), w)
 	if err != nil {
-		return
-	}
-	err = tmpl.ExecuteTemplate(w, "base", nil)
-	if err != nil {
+		fmt.Println(err)
 		return
 	}
 }
@@ -37,6 +36,7 @@ func (cr *CreateSessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Req
 	input.PatientId = r.FormValue("paciente_id")
 	input.Date, err = time.Parse("2006-01-02T15:04", r.FormValue("data_hora"))
 	input.Notes = r.FormValue("notas")
+	input.Plan = r.FormValue("plano")
 	input.Duration, err = time.ParseDuration(r.FormValue("duracao"))
 	input.Price, err = strconv.ParseFloat(r.FormValue("preco"), 64)
 	input.ProfessionalId = r.FormValue("profissional_id")

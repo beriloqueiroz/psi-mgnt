@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/beriloqueiroz/psi-mgnt/internal/application"
+	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes/components"
 	"net/http"
 	"strconv"
 )
@@ -39,7 +40,7 @@ func (cr *ListSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Reques
 		ProfessionalId: professionalId,
 	}
 
-	_, err = cr.listSessionsUseCase.Execute(r.Context(), input)
+	output, err := cr.listSessionsUseCase.Execute(r.Context(), input)
 
 	if err != nil {
 		msg := struct {
@@ -51,12 +52,10 @@ func (cr *ListSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	tmpl, err := GetBaseFormTemplates("sessoes_list.html")
+	h := components.SessionsForm(output)
+	err = h.Render(r.Context(), w)
 	if err != nil {
-		return
-	}
-	err = tmpl.ExecuteTemplate(w, "base", nil)
-	if err != nil {
+		fmt.Println(err)
 		return
 	}
 }

@@ -8,17 +8,19 @@ templ Layout(children ...templ.Component) {
             <meta name="viewport" content="width=device-width, initial-scale=1"/>
             <title>Gerenciador</title>
             <link href="/static/css/tailwind.css" rel="stylesheet"/>
+            <link href="/static/css/global.css" rel="stylesheet"/>
+            <link href="/static/css/tables.css" rel="stylesheet"/>
 		</head>
 		<header>
-		    menu
+            @Menu()
 		</header>
-		<body>
+		<body class="mx-4">
 			for _, child := range children {
 				@child
 			}
 		</body>
-		<footer>
-		    footer
+		<footer class="fixed bottom-0 m-2 flex justify-center w-full">
+		    by Berilo Queiroz
 		</footer>
 	</html>
 }
