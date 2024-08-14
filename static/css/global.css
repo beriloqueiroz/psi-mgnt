@@ -40,7 +40,14 @@ html {
  */
 body {
     margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.42em;
+    background-color:#1F2739;
+    color: #9ca3af;
 }
+
+
 
 /*
  * Inheriting box-sizing
@@ -159,6 +166,7 @@ dfn {
 h1 {
     font-size: 2em;
     margin: 0.67em 0;
+    text-align: center;
 }
 
 /*

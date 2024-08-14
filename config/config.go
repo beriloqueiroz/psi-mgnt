@@ -2,17 +2,18 @@ package config
 
 import "github.com/spf13/viper"
 
-type conf struct {
+type Conf struct {
 	DBUri                    string `mapstructure:"DB_URI"`
 	DBDatabase               string `mapstructure:"DB_DATABASE"`
 	DBSessionCollection      string `mapstructure:"DB_SESSION_COLLECTION"`
 	DBPatientCollection      string `mapstructure:"DB_PATIENT_COLLECTION"`
 	DBProfessionalCollection string `mapstructure:"DB_PROFESSIONAL_COLLECTION"`
 	WebServerPort            string `mapstructure:"WEB_SERVER_PORT"`
+	OtelExporterEndpoint     string `mapstructure:"OTEL_EXPORTER_OTLP_ENDPOINT"`
 }
 
-func LoadConfig(paths []string) (*conf, error) {
-	var cfg *conf
+func LoadConfig(paths []string) (*Conf, error) {
+	var cfg *Conf
 	viper.SetConfigName("app_config")
 	viper.SetConfigType("env")
 	for _, path := range paths {

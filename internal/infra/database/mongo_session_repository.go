@@ -3,15 +3,13 @@ package infra
 import (
 	"context"
 	"fmt"
-	"slices"
-	"time"
-
 	"github.com/beriloqueiroz/psi-mgnt/internal/application"
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"slices"
 )
 
 type MongoSessionRepository struct {
@@ -79,7 +77,6 @@ func connectToMongoDb(uri string, ctx context.Context) (*mongo.Client, error) {
 }
 
 func (mr *MongoSessionRepository) Create(ctx context.Context, session *domain.Session) error {
-	fmt.Println(session)
 	_, err := mr.SessionCollection.InsertOne(ctx, session)
 	if err != nil {
 		return err
@@ -276,13 +273,4 @@ func (mr *MongoSessionRepository) CreateProfessional(ctx context.Context, profes
 		return err
 	}
 	return nil
-}
-func Connect(uri string) (*mongo.Client, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
-	if err != nil {
-		return &mongo.Client{}, err
-	}
-	return client, nil
 }

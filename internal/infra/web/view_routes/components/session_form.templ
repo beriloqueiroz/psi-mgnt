@@ -8,12 +8,14 @@ templ SessionForm() {
 
 templ sessionForm() {
 	<h1>Cadastro de Sessão</h1>
-    <form action="/session" method="POST">
+    <form action="/session" method="POST" class="w-1/2 flex flex-col gap-1 m-auto">
         @InputText("paciente_nome", true, "Paciente", "")
         @InputText("profissional_nome", true, "Profissional", "")
         @InputText("duracao", true, "Duração", "50m")
-        @InputDate("data_hora", true, "Data e Hora", time.Now().Format("02/Jan/2006 15:04:05 "))
-        @InputText("preco", false, "Preço", "25")
+        <div class="flex justify-between gap-2">
+            @InputDate("data_hora", true, "Data e Hora", time.Now().Format("02/Jan/2006 15:04:05 "))
+            @InputText("preco", false, "Preço", "25")
+        </div>
         @InputText("plano", false, "Plano", "UNIMED FORTALEZA")
         @InputTextArea("notas", false, "4", "Notas", "")
         <input type="text" hidden="hidden" id="profissional_id" name="profissional_id">
