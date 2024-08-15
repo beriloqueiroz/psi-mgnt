@@ -89,7 +89,7 @@ func (cr *ListSessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Reque
 		}{
 			Message: err.Error(),
 		}
-		http.Redirect(w, r, fmt.Sprintf("/sessions/%s?error_msg=%s", msg), http.StatusMovedPermanently)
+		http.Redirect(w, r, fmt.Sprintf("/sessions?error_msg=%s", msg), http.StatusMovedPermanently)
 		return
 	}
 

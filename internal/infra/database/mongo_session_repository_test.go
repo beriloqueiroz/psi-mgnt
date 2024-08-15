@@ -2,6 +2,12 @@ package infra
 
 import (
 	"context"
+	"fmt"
+	"github.com/docker/go-connections/nat"
+	"github.com/testcontainers/testcontainers-go"
+	"go.mongodb.org/mongo-driver/bson"
+	"log"
+	"os"
 	"testing"
 	"time"
 
@@ -9,33 +15,81 @@ import (
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 var ctx context.Context
 var mongoRepo *MongoSessionRepository
+var mongoContainer testcontainers.Container
 
-func after() {
-	clear()
-	defer mongoRepo.Client.Disconnect(ctx)
+const mongoUser = "root"
+const mongoPassword = "example"
+const mongoDatabase = "psimgnt"
+
+func TestMain(m *testing.M) {
+	setup()
+	defer teardown()
+
+	// Run all the tests
+	code := m.Run()
+
+	// Exit with the received code
+	os.Exit(code)
+}
+
+func setup() {
+	log.Println("setup suite")
+	ctx = context.Background()
+	req := testcontainers.ContainerRequest{
+		Image: "docker.io/mongo",
+		Env:   map[string]string{"MONGO_INITDB_ROOT_USERNAME": mongoUser, "MONGO_INITDB_ROOT_PASSWORD": mongoPassword, "MONGO_INITDB_DATABASE": mongoDatabase},
+	}
+	var err error
+
+	mongoContainer, err = testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func teardown() {
+	log.Println("teardown suite")
+	func() {
+		if err := mongoContainer.Terminate(ctx); err != nil {
+			log.Fatalf("failed to terminate container: %s", err)
+		}
+	}()
 }
 
 func before() {
-	ctx = context.Background()
-	var err error
+	log.Println("setup test")
+	host, err := mongoContainer.PortEndpoint(ctx, nat.Port("27017"), "")
+	if err != nil {
+		log.Fatalf("failed to start container: %s", err)
+	}
 
+	uri := fmt.Sprintf("mongodb://%s:%s@%s", mongoUser, mongoPassword, host)
 	mongoRepo, err = NewMongoSessionRepository(
 		ctx,
-		"mongodb://root:example@localhost:27017",
+		uri,
 		"patients",
 		"professionals",
 		"sessions",
-		"psimgnt_test",
+		mongoDatabase,
 	)
 	if err != nil {
 		panic(err)
 	}
 	clear()
+}
+
+func after() {
+	log.Println("teardown test")
+	clear()
+	mongoRepo.Client.Disconnect(ctx)
 }
 
 func clear() {
@@ -44,6 +98,10 @@ func clear() {
 		panic(err)
 	}
 	_, err = mongoRepo.SessionCollection.DeleteMany(ctx, bson.D{{}})
+	if err != nil {
+		panic(err)
+	}
+	_, err = mongoRepo.ProfessionalCollection.DeleteMany(ctx, bson.D{{}})
 	if err != nil {
 		panic(err)
 	}
