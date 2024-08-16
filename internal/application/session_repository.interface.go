@@ -7,14 +7,20 @@ import (
 )
 
 type ListByProfessionalRepositoryInput struct {
-	ProfessionalId string
-	PageSize       int
-	Page           int
+	ProfessionalId  string
+	PageSize        int
+	Page            int
+	PatientNameTerm string `json:"patient_name"`
+	StartDate       string `json:"start_date"`
+	EndDate         string `json:"end_date"`
 }
 
 type ListRepositoryInput struct {
-	PageSize int
-	Page     int
+	PageSize        int
+	Page            int
+	PatientNameTerm string `json:"patient_name"`
+	StartDate       string `json:"start_date"`
+	EndDate         string `json:"end_date"`
 }
 
 type DeleteRepositoryInput struct {

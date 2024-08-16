@@ -1,4 +1,4 @@
-package routes
+package api_routes
 
 import (
 	"encoding/json"

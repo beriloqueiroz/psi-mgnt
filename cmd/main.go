@@ -6,7 +6,7 @@ import (
 	"github.com/beriloqueiroz/psi-mgnt/config"
 	"github.com/beriloqueiroz/psi-mgnt/internal/application"
 	infra "github.com/beriloqueiroz/psi-mgnt/internal/infra/database"
-	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/routes"
+	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/api_routes"
 	webserver "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/server"
 	routes_view "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes"
 	"github.com/beriloqueiroz/psi-mgnt/pkg/otel_b"
@@ -71,12 +71,12 @@ func main() {
 	deleteSessionUseCase := application.NewDeleteSessionUseCase(sessionRepository)
 	listSessionsUsecase := application.NewListSessionsUseCase(sessionRepository)
 
-	// api routes
-	createSessionRoute := routes.NewCreateSessionRoute(*createSessionUseCase)
-	createProfessionalRoute := routes.NewCreateProfessionalRoute(*createProfessionalUseCase)
-	searchPatientsRoute := routes.NewSearchPatientsRoute(*searchPatientsUseCase)
-	deleteSessionRoute := routes.NewDeleteSessionRoute(*deleteSessionUseCase)
-	listSessionRoute := routes.NewListSessionsRoute(*listSessionsUsecase)
+	// api api_routes
+	createSessionRoute := api_routes.NewCreateSessionRoute(*createSessionUseCase)
+	createProfessionalRoute := api_routes.NewCreateProfessionalRoute(*createProfessionalUseCase)
+	searchPatientsRoute := api_routes.NewSearchPatientsRoute(*searchPatientsUseCase)
+	deleteSessionRoute := api_routes.NewDeleteSessionRoute(*deleteSessionUseCase)
+	listSessionRoute := api_routes.NewListSessionsRoute(*listSessionsUsecase)
 
 	server.AddRoute("POST /api", createSessionRoute.Handler)
 	server.AddRoute("POST /api/professional", createProfessionalRoute.Handler)

@@ -19,9 +19,12 @@ func NewListSessionsUseCase(
 }
 
 type ListSessionsInputDto struct {
-	PageSize       int    `json:"page_size"`
-	Page           int    `json:"page"`
-	ProfessionalId string `json:"professional_id"`
+	PageSize        int    `json:"page_size"`
+	Page            int    `json:"page"`
+	ProfessionalId  string `json:"professional_id"`
+	PatientNameTerm string `json:"patient_name"`
+	StartDate       string `json:"start_date"`
+	EndDate         string `json:"end_date"`
 }
 
 type ListSessionsOutputDto struct {

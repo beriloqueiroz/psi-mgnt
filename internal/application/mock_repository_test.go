@@ -23,12 +23,16 @@ func (m *mockSessionRepository) Delete(ctx context.Context, input DeleteReposito
 
 func (m *mockSessionRepository) ListByProfessional(ctx context.Context, input ListByProfessionalRepositoryInput) ([]*domain.Session, error) {
 	args := m.Called(input)
-	return args.Get(0).([]*domain.Session), args.Error(1)
+	list := args.Get(0).([]*domain.Session)
+	start, end := Paginate(input.Page, input.PageSize, len(list))
+	return list[start:end], args.Error(1)
 }
 
 func (m *mockSessionRepository) List(ctx context.Context, input ListRepositoryInput) ([]*domain.Session, error) {
 	args := m.Called(input)
-	return args.Get(0).([]*domain.Session), args.Error(1)
+	list := args.Get(0).([]*domain.Session)
+	start, end := Paginate(input.Page, input.PageSize, len(list))
+	return list[start:end], args.Error(1)
 }
 
 func (m *mockSessionRepository) FindPatient(ctx context.Context, input FindPatientRepositoryInput) (*domain.Patient, error) {
@@ -65,4 +69,19 @@ func (m *mockSessionRepository) SearchProfessionalsByName(ctx context.Context, i
 func (m *mockSessionRepository) CreateProfessional(ctx context.Context, professional *domain.Professional) error {
 	args := m.Called(professional)
 	return args.Error(0)
+}
+
+func Paginate(pageNum int, pageSize int, sliceLength int) (int, int) {
+	start := (pageNum - 1) * pageSize
+
+	if start > sliceLength {
+		start = sliceLength
+	}
+
+	end := start + pageSize
+	if end > sliceLength {
+		end = sliceLength
+	}
+
+	return start, end
 }
