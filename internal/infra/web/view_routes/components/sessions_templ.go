@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "github.com/beriloqueiroz/psi-mgnt/internal/application"
 
-func SessionsForm(items []*application.ListSessionsOutputDto) templ.Component {
+func SessionsForm(items application.ListSessionsOutputDto) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -36,7 +36,7 @@ func SessionsForm(items []*application.ListSessionsOutputDto) templ.Component {
 	})
 }
 
-func sessionsForm(items []*application.ListSessionsOutputDto) templ.Component {
+func sessionsForm(items application.ListSessionsOutputDto) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -58,7 +58,7 @@ func sessionsForm(items []*application.ListSessionsOutputDto) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, item := range items {
+		for _, item := range items.Content {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<tr><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -159,7 +159,7 @@ func sessionsForm(items []*application.ListSessionsOutputDto) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if len(items) == 0 {
+		if len(items.Content) == 0 {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<tr><td colspan=\"5\">Nenhuma sessão cadastrada.</td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

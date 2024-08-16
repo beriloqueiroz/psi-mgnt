@@ -2,11 +2,11 @@ package components
 
 import "github.com/beriloqueiroz/psi-mgnt/internal/application"
 
-templ SessionsForm(items []*application.ListSessionsOutputDto) {
+templ SessionsForm(items application.ListSessionsOutputDto) {
     @Layout(sessionsForm(items))
 }
 
-templ sessionsForm(items []*application.ListSessionsOutputDto) {
+templ sessionsForm(items application.ListSessionsOutputDto) {
     <main class="mx-auto">
     <h1>Lista de Sessões</h1>
     <table>
@@ -20,7 +20,7 @@ templ sessionsForm(items []*application.ListSessionsOutputDto) {
         </tr>
         </thead>
         <tbody>
-        for _, item := range items {
+        for _, item := range items.Content {
             <tr>
                 <td>{item.ID}</td>
                 <td>{item.PatientName}</td>
@@ -37,7 +37,7 @@ templ sessionsForm(items []*application.ListSessionsOutputDto) {
                 </td>
             </tr>
         }
-        if len(items) == 0 {
+        if len(items.Content) == 0 {
             <tr>
                 <td colspan="5">Nenhuma sessão cadastrada.</td>
             </tr>

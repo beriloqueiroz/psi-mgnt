@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/beriloqueiroz/psi-mgnt/internal/application"
 	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes/components"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/helpers"
 	"net/http"
 	"strconv"
 )
@@ -34,9 +35,12 @@ func (cr *ListSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Reques
 		err = nil
 	}
 	professionalId := r.PathValue("professionalId")
+	listConfig := helpers.ListConfig{
+		PageSize: pageSizeInt,
+		Page:     pageInt,
+	}
 	input := application.ListSessionsInputDto{
-		PageSize:       pageSizeInt,
-		Page:           pageInt,
+		ListConfig:     listConfig,
 		ProfessionalId: professionalId,
 	}
 

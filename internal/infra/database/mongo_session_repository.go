@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/beriloqueiroz/psi-mgnt/internal/application"
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/helpers"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -96,12 +97,12 @@ func (mr *MongoSessionRepository) Delete(ctx context.Context, input application.
 	}
 	return nil
 }
-func (mr *MongoSessionRepository) ListByProfessional(ctx context.Context, input application.ListByProfessionalRepositoryInput) ([]*domain.Session, error) {
-	l := int64(input.PageSize)
-	skip := int64(input.Page*input.PageSize - input.PageSize)
+func (mr *MongoSessionRepository) ListByProfessional(ctx context.Context, input application.ListByProfessionalRepositoryInput) (*helpers.Pages[domain.Session], error) {
+	l := int64(input.ListConfig.PageSize)
+	skip := int64(input.ListConfig.Page*input.ListConfig.PageSize - input.ListConfig.PageSize)
 	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
 
-	var results []*domain.Session
+	var results []domain.Session
 	cur, err := mr.SessionCollection.Find(ctx, bson.D{{Key: "professional.id", Value: input.ProfessionalId}}, &findOptions)
 	if err != nil {
 		return nil, err
@@ -114,7 +115,7 @@ func (mr *MongoSessionRepository) ListByProfessional(ctx context.Context, input 
 			return nil, err
 		}
 
-		results = append(results, &elem)
+		results = append(results, elem)
 	}
 
 	if err := cur.Err(); err != nil {
@@ -122,14 +123,19 @@ func (mr *MongoSessionRepository) ListByProfessional(ctx context.Context, input 
 	}
 
 	cur.Close(ctx)
-	return results, nil
+	return &helpers.Pages[domain.Session]{
+		Content:  results,
+		Page:     input.ListConfig.Page,
+		PageSize: input.ListConfig.PageSize,
+		Size:     100,
+	}, nil
 }
-func (mr *MongoSessionRepository) List(ctx context.Context, input application.ListRepositoryInput) ([]*domain.Session, error) {
-	l := int64(input.PageSize)
-	skip := int64(input.Page*input.PageSize - input.PageSize)
+func (mr *MongoSessionRepository) List(ctx context.Context, input application.ListRepositoryInput) (*helpers.Pages[domain.Session], error) {
+	l := int64(input.ListConfig.PageSize)
+	skip := int64(input.ListConfig.Page*input.ListConfig.PageSize - input.ListConfig.PageSize)
 	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
 
-	var results []*domain.Session
+	var results []domain.Session
 	cur, err := mr.SessionCollection.Find(ctx, bson.D{}, &findOptions)
 	if err != nil {
 		return nil, err
@@ -142,7 +148,7 @@ func (mr *MongoSessionRepository) List(ctx context.Context, input application.Li
 			return nil, err
 		}
 
-		results = append(results, &elem)
+		results = append(results, elem)
 	}
 
 	if err := cur.Err(); err != nil {
@@ -150,7 +156,12 @@ func (mr *MongoSessionRepository) List(ctx context.Context, input application.Li
 	}
 
 	cur.Close(ctx)
-	return results, nil
+	return &helpers.Pages[domain.Session]{
+		Content:  results,
+		Page:     input.ListConfig.Page,
+		PageSize: input.ListConfig.PageSize,
+		Size:     100,
+	}, nil
 }
 func (mr *MongoSessionRepository) FindPatient(ctx context.Context, input application.FindPatientRepositoryInput) (*domain.Patient, error) {
 	filter := bson.D{
@@ -193,21 +204,21 @@ func (mr *MongoSessionRepository) CreatePatient(ctx context.Context, patient *do
 	}
 	return nil
 }
-func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, input application.SearchPatientsByNameRepositoryInput) ([]*domain.Patient, error) {
+func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, input application.SearchPatientsByNameRepositoryInput) (*helpers.Pages[domain.Patient], error) {
 	filter := bson.D{
 		{"$and",
 			bson.A{
-				bson.D{{Key: "name", Value: primitive.Regex{
-					Pattern: "/*" + input.Term + ".*",
+				bson.D{{Key: input.ListConfig.ExpressionFilters[0].PropertyName, Value: primitive.Regex{
+					Pattern: "/*" + input.ListConfig.ExpressionFilters[0].Value.(string) + ".*",
 					Options: "i",
 				}}},
 			}},
 	}
-	l := int64(input.PageSize)
-	skip := int64(input.Page*input.PageSize - input.PageSize)
+	l := int64(input.ListConfig.PageSize)
+	skip := int64(input.ListConfig.Page*input.ListConfig.PageSize - input.ListConfig.PageSize)
 	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
 
-	var results []*domain.Patient
+	var results []domain.Patient
 	cur, err := mr.PatientCollection.Find(ctx, filter, &findOptions)
 	if err != nil {
 		return nil, err
@@ -220,7 +231,7 @@ func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, inpu
 			return nil, err
 		}
 
-		results = append(results, &elem)
+		results = append(results, elem)
 	}
 
 	if err := cur.Err(); err != nil {
@@ -228,23 +239,28 @@ func (mr *MongoSessionRepository) SearchPatientsByName(ctx context.Context, inpu
 	}
 
 	cur.Close(ctx)
-	return results, nil
+	return &helpers.Pages[domain.Patient]{
+		Content:  results,
+		Page:     input.ListConfig.Page,
+		PageSize: input.ListConfig.PageSize,
+		Size:     100,
+	}, nil
 }
-func (mr *MongoSessionRepository) SearchProfessionalsByName(ctx context.Context, input application.SearchProfessionalByNameRepositoryInput) ([]*domain.Professional, error) {
+func (mr *MongoSessionRepository) SearchProfessionalsByName(ctx context.Context, input application.SearchProfessionalByNameRepositoryInput) (*helpers.Pages[domain.Professional], error) {
 	filter := bson.D{
 		{"$and",
 			bson.A{
-				bson.D{{Key: "name", Value: primitive.Regex{
-					Pattern: "/*" + input.Term + ".*",
+				bson.D{{Key: input.ListConfig.ExpressionFilters[0].PropertyName, Value: primitive.Regex{
+					Pattern: "/*" + input.ListConfig.ExpressionFilters[0].Value.(string) + ".*",
 					Options: "i",
 				}}},
 			}},
 	}
-	l := int64(input.PageSize)
-	skip := int64(input.Page*input.PageSize - input.PageSize)
+	l := int64(input.ListConfig.PageSize)
+	skip := int64(input.ListConfig.Page*input.ListConfig.PageSize - input.ListConfig.PageSize)
 	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
 
-	var results []*domain.Professional
+	var results []domain.Professional
 	cur, err := mr.ProfessionalCollection.Find(ctx, filter, &findOptions)
 	if err != nil {
 		return nil, err
@@ -257,7 +273,7 @@ func (mr *MongoSessionRepository) SearchProfessionalsByName(ctx context.Context,
 			return nil, err
 		}
 
-		results = append(results, &elem)
+		results = append(results, elem)
 	}
 
 	if err := cur.Err(); err != nil {
@@ -265,7 +281,12 @@ func (mr *MongoSessionRepository) SearchProfessionalsByName(ctx context.Context,
 	}
 
 	cur.Close(ctx)
-	return results, nil
+	return &helpers.Pages[domain.Professional]{
+		Content:  results,
+		Page:     input.ListConfig.Page,
+		PageSize: input.ListConfig.PageSize,
+		Size:     100,
+	}, nil
 }
 func (mr *MongoSessionRepository) CreateProfessional(ctx context.Context, professional *domain.Professional) error {
 	_, err := mr.ProfessionalCollection.InsertOne(ctx, professional)

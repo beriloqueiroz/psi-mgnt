@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/helpers"
 	"github.com/google/uuid"
 )
 
@@ -33,14 +34,21 @@ type CreateProfessionalOutputDTO struct {
 func (u *CreateProfessionalUseCase) Execute(ctx context.Context, input CreateProfessionalInputDTO) (CreateProfessionalOutputDTO, error) {
 	dto := CreateProfessionalOutputDTO{}
 	professionalsFound, err := u.SessionRepository.SearchProfessionalsByName(ctx, SearchProfessionalByNameRepositoryInput{
-		PageSize: 1,
-		Page:     1,
-		Term:     input.Name,
+		ListConfig: struct {
+			SortField         string
+			IsAscending       bool
+			PageSize          int
+			Page              int
+			AndLogic          bool
+			ExpressionFilters []helpers.ExpressionFilter
+		}{PageSize: 1, Page: 1, ExpressionFilters: []helpers.ExpressionFilter{
+			{PropertyName: "name", Value: input.Name},
+		}},
 	})
 	if err != nil {
 		return dto, err
 	}
-	if len(professionalsFound) > 0 {
+	if len(professionalsFound.Content) > 0 {
 		return dto, errors.New("professional name already exists")
 	}
 	professional, err := domain.NewProfessional(uuid.New().String(), input.Name, input.Document, input.Email)

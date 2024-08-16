@@ -3,6 +3,7 @@ package infra
 import (
 	"context"
 	"fmt"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/helpers"
 	"github.com/docker/go-connections/nat"
 	"github.com/testcontainers/testcontainers-go"
 	"go.mongodb.org/mongo-driver/bson"
@@ -217,10 +218,14 @@ func TestCreateSession_WhenPatientNotExist(t *testing.T) {
 		panic(err)
 	}
 
+	listConfig := helpers.ListConfig{
+		PageSize: 10,
+		Page:     1,
+	}
+
 	inputList := application.ListByProfessionalRepositoryInput{
 		ProfessionalId: professionalId,
-		PageSize:       10,
-		Page:           1,
+		ListConfig:     listConfig,
 	}
 
 	list, err := mongoRepo.ListByProfessional(ctx, inputList)
@@ -231,9 +236,9 @@ func TestCreateSession_WhenPatientNotExist(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, list)
-	assert.Equal(t, session.ID, list[0].ID)
-	assert.Equal(t, session.Notes, list[0].Notes)
-	assert.Equal(t, session.Professional, list[0].Professional)
+	assert.Equal(t, session.ID, list.Content[0].ID)
+	assert.Equal(t, session.Notes, list.Content[0].Notes)
+	assert.Equal(t, session.Professional, list.Content[0].Professional)
 }
 
 func TestFindPatient(t *testing.T) {
@@ -347,10 +352,16 @@ func TestSearchPatientsByTermName(t *testing.T) {
 		panic(err)
 	}
 
-	inputSearch := application.SearchPatientsByNameRepositoryInput{
+	listConfig := helpers.ListConfig{
 		PageSize: 10,
 		Page:     1,
-		Term:     "berilo",
+		ExpressionFilters: []helpers.ExpressionFilter{
+			{PropertyName: "name", Value: "berilo"},
+		},
+	}
+
+	inputSearch := application.SearchPatientsByNameRepositoryInput{
+		ListConfig: listConfig,
 	}
 
 	founds, err := mongoRepo.SearchPatientsByName(ctx, inputSearch)
@@ -361,15 +372,21 @@ func TestSearchPatientsByTermName(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, founds)
-	assert.Equal(t, 3, len(founds))
-	assert.Equal(t, patient1.Name, founds[0].Name)
-	assert.Equal(t, patient2.Name, founds[1].Name)
-	assert.Equal(t, patient3.Name, founds[2].Name)
+	assert.Equal(t, 3, len(founds.Content))
+	assert.Equal(t, patient1.Name, founds.Content[0].Name)
+	assert.Equal(t, patient2.Name, founds.Content[1].Name)
+	assert.Equal(t, patient3.Name, founds.Content[2].Name)
 
-	inputSearch = application.SearchPatientsByNameRepositoryInput{
+	listConfig = helpers.ListConfig{
 		PageSize: 10,
 		Page:     1,
-		Term:     "é",
+		ExpressionFilters: []helpers.ExpressionFilter{
+			{PropertyName: "name", Value: "é"},
+		},
+	}
+
+	inputSearch = application.SearchPatientsByNameRepositoryInput{
+		ListConfig: listConfig,
 	}
 
 	founds, err = mongoRepo.SearchPatientsByName(ctx, inputSearch)
@@ -380,8 +397,8 @@ func TestSearchPatientsByTermName(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, founds)
-	assert.Equal(t, len(founds), 1)
-	assert.Equal(t, patient4.Name, founds[0].Name)
+	assert.Equal(t, len(founds.Content), 1)
+	assert.Equal(t, patient4.Name, founds.Content[0].Name)
 }
 
 func TestListByProfessionalSessions(t *testing.T) {
@@ -437,10 +454,14 @@ func TestListByProfessionalSessions(t *testing.T) {
 		panic(err)
 	}
 
+	listConfig := helpers.ListConfig{
+		PageSize: 10,
+		Page:     1,
+	}
+
 	inputList := application.ListByProfessionalRepositoryInput{
 		ProfessionalId: professionalId,
-		PageSize:       10,
-		Page:           1,
+		ListConfig:     listConfig,
 	}
 	founds, err := mongoRepo.ListByProfessional(ctx, inputList)
 
@@ -450,10 +471,10 @@ func TestListByProfessionalSessions(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, founds)
-	assert.Equal(t, len(founds), 3)
-	assert.Equal(t, session1.ID, founds[0].ID)
-	assert.Equal(t, session2.ID, founds[1].ID)
-	assert.Equal(t, session3.ID, founds[2].ID)
+	assert.Equal(t, len(founds.Content), 3)
+	assert.Equal(t, session1.ID, founds.Content[0].ID)
+	assert.Equal(t, session2.ID, founds.Content[1].ID)
+	assert.Equal(t, session3.ID, founds.Content[2].ID)
 }
 
 func TestDeleteSession(t *testing.T) {
@@ -509,10 +530,14 @@ func TestDeleteSession(t *testing.T) {
 		panic(err)
 	}
 
+	listConfig := helpers.ListConfig{
+		PageSize: 10,
+		Page:     1,
+	}
+
 	inputList := application.ListByProfessionalRepositoryInput{
 		ProfessionalId: professionalId,
-		PageSize:       10,
-		Page:           1,
+		ListConfig:     listConfig,
 	}
 
 	founds, err := mongoRepo.ListByProfessional(ctx, inputList)
@@ -523,10 +548,10 @@ func TestDeleteSession(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, founds)
-	assert.Equal(t, len(founds), 3)
-	assert.Equal(t, session1.ID, founds[0].ID)
-	assert.Equal(t, session2.ID, founds[1].ID)
-	assert.Equal(t, session3.ID, founds[2].ID)
+	assert.Equal(t, len(founds.Content), 3)
+	assert.Equal(t, session1.ID, founds.Content[0].ID)
+	assert.Equal(t, session2.ID, founds.Content[1].ID)
+	assert.Equal(t, session3.ID, founds.Content[2].ID)
 
 	input := application.DeleteRepositoryInput{
 		SessionId: session2.ID,
@@ -546,9 +571,9 @@ func TestDeleteSession(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, founds)
-	assert.Equal(t, len(founds), 2)
-	assert.Equal(t, session1.ID, founds[0].ID)
-	assert.Equal(t, session3.ID, founds[1].ID)
+	assert.Equal(t, len(founds.Content), 2)
+	assert.Equal(t, session1.ID, founds.Content[0].ID)
+	assert.Equal(t, session3.ID, founds.Content[1].ID)
 }
 
 func TestListSessions(t *testing.T) {
@@ -603,9 +628,13 @@ func TestListSessions(t *testing.T) {
 		panic(err)
 	}
 
-	inputList := application.ListRepositoryInput{
+	listConfig := helpers.ListConfig{
 		PageSize: 10,
 		Page:     1,
+	}
+
+	inputList := application.ListRepositoryInput{
+		ListConfig: listConfig,
 	}
 	founds, err := mongoRepo.List(ctx, inputList)
 
@@ -615,10 +644,10 @@ func TestListSessions(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, founds)
-	assert.Equal(t, len(founds), 3)
-	assert.Equal(t, session1.ID, founds[0].ID)
-	assert.Equal(t, session2.ID, founds[1].ID)
-	assert.Equal(t, session3.ID, founds[2].ID)
+	assert.Equal(t, len(founds.Content), 3)
+	assert.Equal(t, session1.ID, founds.Content[0].ID)
+	assert.Equal(t, session2.ID, founds.Content[1].ID)
+	assert.Equal(t, session3.ID, founds.Content[2].ID)
 }
 
 func TestCreateProfessional(t *testing.T) {

@@ -2,6 +2,7 @@ package api_routes
 
 import (
 	"encoding/json"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/helpers"
 	"net/http"
 	"strconv"
 
@@ -27,9 +28,13 @@ func (cr *ListSessionsRoute) Handler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		pageInt = 1
 	}
-	input := application.ListSessionsInputDto{
+
+	listConfig := helpers.ListConfig{
 		PageSize: pageSizeInt,
 		Page:     pageInt,
+	}
+	input := application.ListSessionsInputDto{
+		ListConfig: listConfig,
 	}
 
 	output, err := cr.listSessionsUseCase.Execute(r.Context(), input)

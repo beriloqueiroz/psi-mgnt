@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/helpers"
 	"time"
 )
 
@@ -19,15 +20,13 @@ func NewListSessionsUseCase(
 }
 
 type ListSessionsInputDto struct {
-	PageSize        int    `json:"page_size"`
-	Page            int    `json:"page"`
-	ProfessionalId  string `json:"professional_id"`
-	PatientNameTerm string `json:"patient_name"`
-	StartDate       string `json:"start_date"`
-	EndDate         string `json:"end_date"`
+	ListConfig     helpers.ListConfig
+	ProfessionalId string `json:"professional_id"`
 }
 
-type ListSessionsOutputDto struct {
+type ListSessionsOutputDto helpers.Pages[*ListSessionsOutputDtoItem]
+
+type ListSessionsOutputDtoItem struct {
 	ID               string        `json:"id"`
 	Price            float64       `json:"price"`
 	Notes            string        `json:"notes"`
@@ -38,44 +37,43 @@ type ListSessionsOutputDto struct {
 	ProfessionalName string        `json:"professional_name"`
 }
 
-func (u *ListSessionsUseCase) Execute(ctx context.Context, input ListSessionsInputDto) ([]*ListSessionsOutputDto, error) {
+func (u *ListSessionsUseCase) Execute(ctx context.Context, input ListSessionsInputDto) (ListSessionsOutputDto, error) {
 	pageSizeParsed := 50
 	pageParsed := 1
-	if input.PageSize >= 0 {
-		pageSizeParsed = input.PageSize
+	if input.ListConfig.PageSize >= 0 {
+		pageSizeParsed = input.ListConfig.PageSize
 	}
-	if input.Page >= 1 {
-		pageParsed = input.Page
+	if input.ListConfig.Page >= 1 {
+		pageParsed = input.ListConfig.Page
 	}
 
-	var sessions []*domain.Session
+	var sessions *helpers.Pages[domain.Session]
 	var err error
 
+	listConfig := helpers.ListConfig{SortField: "", IsAscending: true, PageSize: pageSizeParsed, Page: pageParsed, AndLogic: false, ExpressionFilters: []helpers.ExpressionFilter{}}
 	if input.ProfessionalId != "" {
 		repoInput := ListByProfessionalRepositoryInput{
 			ProfessionalId: input.ProfessionalId,
-			PageSize:       pageSizeParsed,
-			Page:           pageParsed,
+			ListConfig:     listConfig,
 		}
 		sessions, err = u.SessionRepository.ListByProfessional(ctx, repoInput)
 	} else {
 		repoInput := ListRepositoryInput{
-			PageSize: pageSizeParsed,
-			Page:     pageParsed,
+			listConfig,
 		}
 		sessions, err = u.SessionRepository.List(ctx, repoInput)
 	}
 
 	if err != nil {
-		return []*ListSessionsOutputDto{}, err
+		return ListSessionsOutputDto{}, err
 	}
-	dto := []*ListSessionsOutputDto{}
-	for _, session := range sessions {
+	dto := ListSessionsOutputDto{}
+	for _, session := range sessions.Content {
 		var profesionalName string
 		if session.Professional != nil {
 			profesionalName = session.Professional.Name
 		}
-		dto = append(dto, &ListSessionsOutputDto{
+		dto.Content = append(dto.Content, &ListSessionsOutputDtoItem{
 			ID:               session.ID,
 			Price:            session.Price,
 			Notes:            session.Notes,
@@ -86,5 +84,8 @@ func (u *ListSessionsUseCase) Execute(ctx context.Context, input ListSessionsInp
 			Plan:             session.Plan,
 		})
 	}
+	dto.Size = sessions.Size
+	dto.PageSize = sessions.PageSize
+	dto.Page = sessions.Page
 	return dto, nil
 }

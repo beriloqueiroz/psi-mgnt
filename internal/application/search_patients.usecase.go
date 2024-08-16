@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/helpers"
 )
 
 type SearchPatientsUseCase struct {
@@ -45,17 +46,19 @@ func (u *SearchPatientsUseCase) Execute(ctx context.Context, input SearchPatient
 	if input.Page >= 1 {
 		pageParsed = input.Page
 	}
-	repoInput := SearchPatientsByNameRepositoryInput{
-		Term:     input.Term,
+	listConfig := helpers.ListConfig{
 		PageSize: pageSizeParsed,
 		Page:     pageParsed,
+	}
+	repoInput := SearchPatientsByNameRepositoryInput{
+		ListConfig: listConfig,
 	}
 	patients, err := u.SessionRepository.SearchPatientsByName(ctx, repoInput)
 	if err != nil {
 		return []*SearchPatientsOutputDTO{}, err
 	}
 	dto := []*SearchPatientsOutputDTO{}
-	for _, patient := range patients {
+	for _, patient := range patients.Content {
 		var phones []PhoneOutputDTO
 		for _, phone := range patient.Phones {
 			phones = append(phones, PhoneOutputDTO{
