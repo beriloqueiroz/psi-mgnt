@@ -20,7 +20,6 @@ func (cr *SearchPatientsRoute) Handler(w http.ResponseWriter, r *http.Request) {
 	input := application.SearchPatientsInputDTO{
 		Term: term,
 	}
-
 	output, err := cr.searchPatientsUseCase.Execute(r.Context(), input)
 
 	if err != nil {
@@ -36,6 +35,7 @@ func (cr *SearchPatientsRoute) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(output)
 }

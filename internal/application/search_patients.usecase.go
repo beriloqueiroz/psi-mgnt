@@ -49,6 +49,9 @@ func (u *SearchPatientsUseCase) Execute(ctx context.Context, input SearchPatient
 	listConfig := helpers.ListConfig{
 		PageSize: pageSizeParsed,
 		Page:     pageParsed,
+		ExpressionFilters: []helpers.ExpressionFilter{
+			{PropertyName: "name", Value: input.Term},
+		},
 	}
 	repoInput := SearchPatientsByNameRepositoryInput{
 		ListConfig: listConfig,

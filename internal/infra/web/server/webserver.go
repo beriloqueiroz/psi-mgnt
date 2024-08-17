@@ -32,12 +32,23 @@ func (s *WebServer) AddRoute(path string, handler http.HandlerFunc) {
 func (s *WebServer) Start() {
 	mux := http.NewServeMux()
 	for path, handler := range s.Handlers {
-		mux.Handle(path, s.TelemetryMiddleware(path, handler))
+		if s.TelemetryMiddleware == nil {
+			mux.HandleFunc(path, cors(handler))
+			continue
+		}
+		mux.Handle(path, s.TelemetryMiddleware(path, cors(handler)))
 	}
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 	err := http.ListenAndServe(s.WebServerPort, mux)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func cors(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		handler.ServeHTTP(w, r)
 	}
 }

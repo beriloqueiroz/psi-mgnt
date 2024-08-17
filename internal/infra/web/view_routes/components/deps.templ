@@ -1,0 +1,9 @@
+package components
+
+var jqueryHandle = templ.NewOnceHandle()
+
+templ JQuery() {
+  @jqueryHandle.Once() {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  }
+}

@@ -102,7 +102,7 @@ func sessionForm() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</form><script type=\"text/javascript\">\n        var elem = document.getElementById(\"paciente_nome\")\n        var elem2 = document.getElementById(\"profissional_nome\")\n        function searPatients() {\n            if (elem.value.length > 3){\n                fetch('/api/patient?term='+elem.value)\n                    .then(T => T.json())\n                    .then(console.log)\n            }\n        }\n        function searchProfessionals() {\n                    if (elem2.value.length > 3){\n                        fetch('/api/professional?term='+elem2.value)\n                            .then(T => T.json())\n                            .then(console.log)\n                    }\n                }\n        elem.onkeyup = searPatients;\n        elem2.onkeyup = searchProfessionals;\n    </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

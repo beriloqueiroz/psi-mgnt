@@ -23,4 +23,24 @@ templ sessionForm() {
 
         @Button("cadastrar", "submit")
     </form>
+    <script type="text/javascript">
+        var elem = document.getElementById("paciente_nome")
+        var elem2 = document.getElementById("profissional_nome")
+        function searPatients() {
+            if (elem.value.length > 3){
+                fetch('/api/patient?term='+elem.value)
+                    .then(T => T.json())
+                    .then(console.log)
+            }
+        }
+        function searchProfessionals() {
+                    if (elem2.value.length > 3){
+                        fetch('/api/professional?term='+elem2.value)
+                            .then(T => T.json())
+                            .then(console.log)
+                    }
+                }
+        elem.onkeyup = searPatients;
+        elem2.onkeyup = searchProfessionals;
+    </script>
 }
