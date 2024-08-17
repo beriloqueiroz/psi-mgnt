@@ -24,14 +24,14 @@ func (m *mockSessionRepository) Delete(ctx context.Context, input DeleteReposito
 
 func (m *mockSessionRepository) ListByProfessional(ctx context.Context, input ListByProfessionalRepositoryInput) (*helpers.Pages[domain.Session], error) {
 	args := m.Called(input)
-	list := args.Get(0).(helpers.Pages[domain.Session])
+	list := args.Get(0).(*helpers.Pages[domain.Session])
 	start, end := Paginate(input.ListConfig.Page, input.ListConfig.PageSize, len(list.Content))
 	return &helpers.Pages[domain.Session]{Content: list.Content[start:end]}, args.Error(1)
 }
 
 func (m *mockSessionRepository) List(ctx context.Context, input ListRepositoryInput) (*helpers.Pages[domain.Session], error) {
 	args := m.Called(input)
-	list := args.Get(0).(helpers.Pages[domain.Session])
+	list := args.Get(0).(*helpers.Pages[domain.Session])
 	start, end := Paginate(input.ListConfig.Page, input.ListConfig.PageSize, len(list.Content))
 	return &helpers.Pages[domain.Session]{Content: list.Content[start:end]}, args.Error(1)
 }

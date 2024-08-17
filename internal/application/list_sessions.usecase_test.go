@@ -17,7 +17,7 @@ func TestListSessionsUseCase_Execute(t *testing.T) {
 
 	usecase := NewListSessionsUseCase(mockRepo)
 
-	sessions := []*domain.Session{
+	sessions := []domain.Session{
 		{
 			ID:       uuid.New().String(),
 			Price:    12,
@@ -72,7 +72,7 @@ func TestListSessionsUseCase_Execute(t *testing.T) {
 		ListConfig: listConfig,
 	}
 
-	mockRepo.On("List", mock.Anything).Return(sessions, nil)
+	mockRepo.On("List", mock.Anything).Return(&helpers.Pages[domain.Session]{Content: sessions}, nil)
 
 	output, err := usecase.Execute(context.Background(), input)
 
@@ -89,7 +89,7 @@ func TestListSessionsUseCase_WhenProfessional_Execute(t *testing.T) {
 
 	usecase := NewListSessionsUseCase(mockRepo)
 
-	sessions := []*domain.Session{
+	sessions := []domain.Session{
 		{
 			ID:       uuid.New().String(),
 			Price:    12,
@@ -147,7 +147,7 @@ func TestListSessionsUseCase_WhenProfessional_Execute(t *testing.T) {
 		ProfessionalId: "123",
 	}
 
-	mockRepo.On("ListByProfessional", mock.Anything).Return(sessions, nil)
+	mockRepo.On("ListByProfessional", mock.Anything).Return(&helpers.Pages[domain.Session]{Content: sessions}, nil)
 
 	output, err := usecase.Execute(context.Background(), input)
 
@@ -165,7 +165,7 @@ func TestListSessionsWithPaginationUseCase_Execute(t *testing.T) {
 
 	usecase := NewListSessionsUseCase(mockRepo)
 
-	sessions := []*domain.Session{
+	sessions := []domain.Session{
 		{
 			ID:       uuid.New().String(),
 			Price:    12,
@@ -222,7 +222,7 @@ func TestListSessionsWithPaginationUseCase_Execute(t *testing.T) {
 		ListConfig: listConfig,
 	}
 
-	mockRepo.On("List", mock.Anything).Return(sessions, nil)
+	mockRepo.On("List", mock.Anything).Return(&helpers.Pages[domain.Session]{Content: sessions}, nil)
 
 	output, err := usecase.Execute(context.Background(), input)
 
@@ -234,7 +234,7 @@ func TestListSessionsWithPaginationUseCase_Execute(t *testing.T) {
 
 	input.ListConfig.PageSize = 1
 	input.ListConfig.Page = 2
-	mockRepo.On("List", mock.Anything).Return(sessions, nil)
+	mockRepo.On("List", mock.Anything).Return(&helpers.Pages[domain.Session]{Content: sessions}, nil)
 
 	output, err = usecase.Execute(context.Background(), input)
 

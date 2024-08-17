@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/helpers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -20,7 +21,7 @@ func TestCreateProfessionalUseCase_Execute(t *testing.T) {
 		Phone:    "111225525252",
 	}
 
-	mockRepo.On("SearchProfessionalsByName", mock.Anything).Return([]*domain.Professional{}, nil)
+	mockRepo.On("SearchProfessionalsByName", mock.Anything).Return(&helpers.Pages[domain.Professional]{}, nil)
 	mockRepo.On("CreateProfessional", mock.Anything).Return(nil)
 
 	output, err := useCase.Execute(context.Background(), input)
@@ -49,7 +50,10 @@ func TestCreateProfessional_WhenExistsProfessional_UseCase_Execute(t *testing.T)
 		ID:   "123",
 		Name: "John Doe Prof",
 	}
-	mockRepo.On("SearchProfessionalsByName", mock.Anything).Return([]*domain.Professional{existingProfessional}, nil)
+	mockRepo.On("SearchProfessionalsByName",
+		mock.Anything).Return(&helpers.Pages[domain.Professional]{
+		Content: []domain.Professional{*existingProfessional},
+	}, nil)
 
 	_, err := useCase.Execute(context.Background(), input)
 

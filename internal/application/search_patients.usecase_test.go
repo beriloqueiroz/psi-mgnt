@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/helpers"
 	"testing"
 
 	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
@@ -15,7 +16,7 @@ func TestSearchPatientsUseCase_Execute(t *testing.T) {
 
 	usecase := NewSearchPatientsUseCase(mockRepo)
 
-	patients := []*domain.Patient{
+	patients := []domain.Patient{
 		{
 			ID:   uuid.New().String(),
 			Name: "Aliba",
@@ -36,7 +37,9 @@ func TestSearchPatientsUseCase_Execute(t *testing.T) {
 		Page:     0,
 	}
 
-	mockRepo.On("SearchPatientsByName", mock.Anything).Return(patients, nil)
+	mockRepo.On("SearchPatientsByName", mock.Anything).Return(&helpers.Pages[domain.Patient]{
+		Content: patients,
+	}, nil)
 
 	output, err := usecase.Execute(context.Background(), input)
 
