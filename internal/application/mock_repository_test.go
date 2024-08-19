@@ -22,14 +22,24 @@ func (m *mockSessionRepository) Delete(ctx context.Context, input DeleteReposito
 	return args.Error(0)
 }
 
-func (m *mockSessionRepository) ListByProfessional(ctx context.Context, input ListByProfessionalRepositoryInput) (*helpers.Pages[domain.Session], error) {
+func (m *mockSessionRepository) List(ctx context.Context, input ListRepositoryInput) (*helpers.Pages[domain.Session], error) {
 	args := m.Called(input)
 	list := args.Get(0).(*helpers.Pages[domain.Session])
 	start, end := Paginate(input.ListConfig.Page, input.ListConfig.PageSize, len(list.Content))
 	return &helpers.Pages[domain.Session]{Content: list.Content[start:end]}, args.Error(1)
 }
 
-func (m *mockSessionRepository) List(ctx context.Context, input ListRepositoryInput) (*helpers.Pages[domain.Session], error) {
+func (m *mockSessionRepository) Update(ctx context.Context, session *domain.Session) error {
+	args := m.Called(session)
+	return args.Error(0)
+}
+
+func (m *mockSessionRepository) Find(ctx context.Context, input FindSessionRepositoryInput) (*domain.Session, error) {
+	args := m.Called(input)
+	return args.Get(0).(*domain.Session), args.Error(1)
+}
+
+func (m *mockSessionRepository) ListByProfessional(ctx context.Context, input ListByProfessionalRepositoryInput) (*helpers.Pages[domain.Session], error) {
 	args := m.Called(input)
 	list := args.Get(0).(*helpers.Pages[domain.Session])
 	start, end := Paginate(input.ListConfig.Page, input.ListConfig.PageSize, len(list.Content))

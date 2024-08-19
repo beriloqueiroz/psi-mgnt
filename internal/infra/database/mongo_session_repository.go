@@ -97,13 +97,13 @@ func (mr *MongoSessionRepository) Delete(ctx context.Context, input application.
 	}
 	return nil
 }
-func (mr *MongoSessionRepository) ListByProfessional(ctx context.Context, input application.ListByProfessionalRepositoryInput) (*helpers.Pages[domain.Session], error) {
+func (mr *MongoSessionRepository) List(ctx context.Context, input application.ListRepositoryInput) (*helpers.Pages[domain.Session], error) {
 	l := int64(input.ListConfig.PageSize)
 	skip := int64(input.ListConfig.Page*input.ListConfig.PageSize - input.ListConfig.PageSize)
 	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
 
 	var results []domain.Session
-	cur, err := mr.SessionCollection.Find(ctx, bson.D{{Key: "professional.id", Value: input.ProfessionalId}}, &findOptions)
+	cur, err := mr.SessionCollection.Find(ctx, bson.D{}, &findOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -130,13 +130,20 @@ func (mr *MongoSessionRepository) ListByProfessional(ctx context.Context, input 
 		Size:     100,
 	}, nil
 }
-func (mr *MongoSessionRepository) List(ctx context.Context, input application.ListRepositoryInput) (*helpers.Pages[domain.Session], error) {
+func (m *MongoSessionRepository) Update(ctx context.Context, session *domain.Session) error {
+	return nil
+}
+func (m *MongoSessionRepository) Find(ctx context.Context, input application.FindSessionRepositoryInput) (*domain.Session, error) {
+	return nil, nil
+}
+
+func (mr *MongoSessionRepository) ListByProfessional(ctx context.Context, input application.ListByProfessionalRepositoryInput) (*helpers.Pages[domain.Session], error) {
 	l := int64(input.ListConfig.PageSize)
 	skip := int64(input.ListConfig.Page*input.ListConfig.PageSize - input.ListConfig.PageSize)
 	findOptions := options.FindOptions{Limit: &l, Skip: &skip}
 
 	var results []domain.Session
-	cur, err := mr.SessionCollection.Find(ctx, bson.D{}, &findOptions)
+	cur, err := mr.SessionCollection.Find(ctx, bson.D{{Key: "professional.id", Value: input.ProfessionalId}}, &findOptions)
 	if err != nil {
 		return nil, err
 	}

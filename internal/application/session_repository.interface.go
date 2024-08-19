@@ -37,11 +37,18 @@ type SearchProfessionalByNameRepositoryInput struct {
 	ListConfig helpers.ListConfig
 }
 
+type FindSessionRepositoryInput struct {
+	ID string
+}
+
 type SessionRepositoryInterface interface {
 	Create(ctx context.Context, session *domain.Session) error
+	Update(ctx context.Context, session *domain.Session) error
 	Delete(ctx context.Context, input DeleteRepositoryInput) error
-	ListByProfessional(ctx context.Context, input ListByProfessionalRepositoryInput) (*helpers.Pages[domain.Session], error)
 	List(ctx context.Context, input ListRepositoryInput) (*helpers.Pages[domain.Session], error)
+	Find(ctx context.Context, input FindSessionRepositoryInput) (*domain.Session, error)
+
+	ListByProfessional(ctx context.Context, input ListByProfessionalRepositoryInput) (*helpers.Pages[domain.Session], error)
 	FindPatient(ctx context.Context, input FindPatientRepositoryInput) (*domain.Patient, error)
 	CreatePatient(ctx context.Context, patient *domain.Patient) error
 	SearchPatientsByName(ctx context.Context, input SearchPatientsByNameRepositoryInput) (*helpers.Pages[domain.Patient], error)
