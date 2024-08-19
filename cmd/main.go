@@ -85,7 +85,7 @@ func main() {
 	server.AddRoute("GET /api/patient", searchPatientsRoute.Handler)
 
 	// views
-	createSessionRouteView := routes_view.NewCreateSessionRouteView(*createSessionUseCase)
+	createSessionRouteView := routes_view.NewSessionRouteView(*createSessionUseCase)
 	server.AddRoute("GET /session", createSessionRouteView.HandlerGet)
 	server.AddRoute("POST /session", createSessionRouteView.HandlerPost)
 

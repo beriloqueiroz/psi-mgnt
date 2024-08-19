@@ -11,15 +11,15 @@ import (
 	"github.com/beriloqueiroz/psi-mgnt/internal/application"
 )
 
-type CreateSessionRouteView struct {
+type SessionRouteView struct {
 	CreateSessionUseCase application.CreateSessionUseCase
 }
 
-func NewCreateSessionRouteView(createSessionUseCase application.CreateSessionUseCase) *CreateSessionRouteView {
-	return &CreateSessionRouteView{createSessionUseCase}
+func NewSessionRouteView(createSessionUseCase application.CreateSessionUseCase) *SessionRouteView {
+	return &SessionRouteView{createSessionUseCase}
 }
 
-func (cr *CreateSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Request) {
+func (cr *SessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Request) {
 	session := domain.Session{ID: "", Patient: &domain.Patient{ID: "111", Name: "berilo ttt"},
 		Professional: &domain.Professional{ID: "111233", Name: "ric"},
 		Duration:     time.Hour,
@@ -29,9 +29,12 @@ func (cr *CreateSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Requ
 		Date:         time.Now(),
 	}
 	if session.ID == "" {
+		session = domain.Session{}
 		session.Date = time.Now()
 		session.Duration = time.Minute * 50
 		session.Price = 50
+		session.Patient = &domain.Patient{}
+		session.Professional = &domain.Professional{}
 	}
 	h := components.SessionForm(session)
 	err := h.Render(r.Context(), w)
@@ -41,7 +44,7 @@ func (cr *CreateSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Requ
 	}
 }
 
-func (cr *CreateSessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Request) {
+func (cr *SessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Request) {
 	var input application.CreateSessionInputDTO
 
 	var err error
