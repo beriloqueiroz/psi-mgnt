@@ -8,10 +8,10 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
 import "strconv"
+import "github.com/beriloqueiroz/psi-mgnt/internal/application"
 
-func SessionForm(session domain.Session) templ.Component {
+func SessionForm(session application.FindSessionOutputDto) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -59,7 +59,7 @@ func Empty() templ.Component {
 	})
 }
 
-func sessionForm(session domain.Session) templ.Component {
+func sessionForm(session application.FindSessionOutputDto) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -81,7 +81,7 @@ func sessionForm(session domain.Session) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 templ.SafeURL = templ.SafeURL("/session" + session.ID)
+		var templ_7745c5c3_Var4 templ.SafeURL = templ.SafeURL("/session/" + session.ID)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var4)))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -90,7 +90,7 @@ func sessionForm(session domain.Session) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = InputText("paciente_nome", true, "Paciente", session.Patient.Name).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = InputText("paciente_nome", true, "Paciente", session.PatientName).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -106,15 +106,15 @@ func sessionForm(session domain.Session) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			if session.Patient.ID != "" {
+			if session.PatientId != "" {
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<option selected class=\"block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var6 string
-				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(session.Patient.ID)
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(session.PatientId)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/infra/web/view_routes/components/session_form.templ`, Line: 19, Col: 128}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/infra/web/view_routes/components/session_form.templ`, Line: 19, Col: 127}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -125,9 +125,9 @@ func sessionForm(session domain.Session) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var7 string
-				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(session.Patient.ID)
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(session.PatientId)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/infra/web/view_routes/components/session_form.templ`, Line: 19, Col: 149}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/infra/web/view_routes/components/session_form.templ`, Line: 19, Col: 147}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -144,7 +144,7 @@ func sessionForm(session domain.Session) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = InputText("profissional_nome", true, "Profissional", session.Professional.Name).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = InputText("profissional_nome", true, "Profissional", session.ProfessionalName).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -248,7 +248,7 @@ func sessionForm(session domain.Session) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</form><script type=\"text/javascript\">\n        var patientNameSearch = document.getElementById(\"paciente_nome\")\n        var selectPatient = document.getElementById(\"paciente_id\")\n        var selectPatientContainer = document.getElementById(\"paciente_id-container\")\n        function searchPatients() {\n            if (patientNameSearch.value.length > 3){\n                fetch('/api/patient?term='+patientNameSearch.value)\n                    .then(T => T.json())\n                    .then(res=>{\n                        selectPatient.innerHTML = null;\n                        for (var i = 0; i<res.length; i++){\n                            const item = res[i];\n                            var opt = document.createElement('option');\n                            opt.value = item.id;\n                            opt.innerHTML = item.name;\n                            opt.onclick = (event)=> {\n                                const patientNameSearchOpt = document.getElementById(\"paciente_nome\")\n                                patientNameSearchOpt.value=event.target.text\n                                selectPatientContainer.classList.add('hidden');\n                            }\n                            selectPatient.appendChild(opt);\n                        }\n                        if (res.length>0){\n                            selectPatientContainer.classList.remove('hidden');\n                        } else {\n                            selectPatientContainer.classList.add('hidden');\n                        }\n                    })\n            } else {\n                selectPatientContainer.classList.add('hidden');\n            }\n        }\n        patientNameSearch.onkeyup = searchPatients;\n        var professionalNameSearch = document.getElementById(\"profissional_nome\")\n        function searchProfessionals() {\n            if (professionalNameSearch.value.length > 3){\n                fetch('/api/professional?term='+elem2.value)\n                    .then(T => T.json())\n                    .then(console.log)\n            }\n        }\n        professionalNameSearch.onkeyup = searchProfessionals;\n\n        const sessionElem = document.getElementById(\"session_id\");\n        if (sessionElem.value != \"\") {\n            const form = document.getElementById(\"form_session\");\n            const all = form.getElementsByTagName(\"*\");\n            const to_enabled = [\"notas\"];\n            Array.prototype.forEach.call(all, (element) => {\n                if (!to_enabled.includes(element.id)) {\n                    element.disabled = true;\n                }\n            });\n        }\n    </script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</form><script type=\"text/javascript\">\n        var patientNameSearch = document.getElementById(\"paciente_nome\")\n        var selectPatient = document.getElementById(\"paciente_id\")\n        var selectPatientContainer = document.getElementById(\"paciente_id-container\")\n        function searchPatients() {\n            if (patientNameSearch.value.length > 3){\n                fetch('/api/patient?term='+patientNameSearch.value)\n                    .then(T => T.json())\n                    .then(res=>{\n                        selectPatient.innerHTML = null;\n                        for (var i = 0; i<res.length; i++){\n                            const item = res[i];\n                            var opt = document.createElement('option');\n                            opt.value = item.id;\n                            opt.innerHTML = item.name;\n                            opt.onclick = (event)=> {\n                                const patientNameSearchOpt = document.getElementById(\"paciente_nome\")\n                                patientNameSearchOpt.value=event.target.text\n                                selectPatientContainer.classList.add('hidden');\n                            }\n                            selectPatient.appendChild(opt);\n                        }\n                        if (res.length>0){\n                            selectPatientContainer.classList.remove('hidden');\n                        } else {\n                            selectPatientContainer.classList.add('hidden');\n                        }\n                    })\n            } else {\n                selectPatientContainer.classList.add('hidden');\n            }\n        }\n        patientNameSearch.onkeyup = searchPatients;\n        var professionalNameSearch = document.getElementById(\"profissional_nome\")\n        function searchProfessionals() {\n            if (professionalNameSearch.value.length > 3){\n                fetch('/api/professional?term='+elem2.value)\n                    .then(T => T.json())\n                    .then(console.log)\n            }\n        }\n        professionalNameSearch.onkeyup = searchProfessionals;\n\n        const sessionElem = document.getElementById(\"session_id\");\n        if (sessionElem.value != \"\") {\n            const form = document.getElementById(\"form_session\");\n            const all = form.getElementsByTagName(\"*\");\n            const to_enabled = [\"notas\", \"button_save\", \"session_id\"];\n            Array.prototype.forEach.call(all, (element) => {\n                if (!to_enabled.includes(element.id) && element.tagName!=\"BUTTON\") {\n                    element.disabled = true;\n                }\n            });\n        }\n    </script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

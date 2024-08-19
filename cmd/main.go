@@ -66,10 +66,12 @@ func main() {
 
 	// usecases
 	createSessionUseCase := application.NewCreateSessionUseCase(sessionRepository)
-	createProfessionalUseCase := application.NewCreateProfessionalUseCase(sessionRepository)
-	searchPatientsUseCase := application.NewSearchPatientsUseCase(sessionRepository)
+	updateSessionUseCase := application.NewUpdateSessionUseCase(sessionRepository)
+	findSessionUseCase := application.NewFindSessionUseCase(sessionRepository)
 	deleteSessionUseCase := application.NewDeleteSessionUseCase(sessionRepository)
 	listSessionsUsecase := application.NewListSessionsUseCase(sessionRepository)
+	searchPatientsUseCase := application.NewSearchPatientsUseCase(sessionRepository)
+	createProfessionalUseCase := application.NewCreateProfessionalUseCase(sessionRepository)
 
 	// api api_routes
 	createSessionRoute := api_routes.NewCreateSessionRoute(*createSessionUseCase)
@@ -85,9 +87,11 @@ func main() {
 	server.AddRoute("GET /api/patient", searchPatientsRoute.Handler)
 
 	// views
-	createSessionRouteView := routes_view.NewSessionRouteView(*createSessionUseCase)
-	server.AddRoute("GET /session", createSessionRouteView.HandlerGet)
-	server.AddRoute("POST /session", createSessionRouteView.HandlerPost)
+	sessionRouteView := routes_view.NewSessionRouteView(*createSessionUseCase, *updateSessionUseCase, *findSessionUseCase)
+	server.AddRoute("GET /session", sessionRouteView.HandlerGet)
+	server.AddRoute("GET /session/{id}", sessionRouteView.HandlerGet)
+	server.AddRoute("POST /session", sessionRouteView.HandlerPost)
+	server.AddRoute("POST /session/{id}", sessionRouteView.HandlerPost)
 
 	createProfessionalRouteView := routes_view.NewCreateProfessionalRouteView(*createProfessionalUseCase)
 

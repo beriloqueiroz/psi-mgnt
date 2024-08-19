@@ -1,25 +1,25 @@
 package components
 
-import "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
 import "strconv"
+import "github.com/beriloqueiroz/psi-mgnt/internal/application"
 
-templ SessionForm(session domain.Session) {
+templ SessionForm(session application.FindSessionOutputDto) {
     @Layout(sessionForm(session))
 }
 
 templ Empty() {
 }
 
-templ sessionForm(session domain.Session) {
+templ sessionForm(session application.FindSessionOutputDto) {
 	<h1>Cadastro de Sessão</h1>
-    <form action={templ.SafeURL("/session"+session.ID)} method="POST" class="w-1/2 flex flex-col gap-1 m-auto" id="form_session">
-        @InputText("paciente_nome", true, "Paciente", session.Patient.Name)
+    <form action={templ.SafeURL("/session/"+session.ID)} method="POST" class="w-1/2 flex flex-col gap-1 m-auto" id="form_session">
+        @InputText("paciente_nome", true, "Paciente", session.PatientName)
         @Select("paciente_id", false, "", "4", "hidden") {
-            if session.Patient.ID != "" {
-                <option selected class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent" value={session.Patient.ID}>{session.Patient.ID}</option>
+            if session.PatientId != "" {
+                <option selected class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent" value={session.PatientId}>{session.PatientId}</option>
             }
         }
-        @InputText("profissional_nome", true, "Profissional", session.Professional.Name)
+        @InputText("profissional_nome", true, "Profissional", session.ProfessionalName)
         @InputText("duracao", true, "Duração", strconv.FormatFloat(session.Duration.Minutes(), 'f', -1, 64)+"min")
         <div class="flex justify-between gap-2">
             @InputDate("data_hora", true, "Data e Hora", session.Date.Format("2006-01-02T15:04:05"))
@@ -85,9 +85,9 @@ templ sessionForm(session domain.Session) {
         if (sessionElem.value != "") {
             const form = document.getElementById("form_session");
             const all = form.getElementsByTagName("*");
-            const to_enabled = ["notas"];
+            const to_enabled = ["notas", "button_save", "session_id"];
             Array.prototype.forEach.call(all, (element) => {
-                if (!to_enabled.includes(element.id)) {
+                if (!to_enabled.includes(element.id) && element.tagName!="BUTTON") {
                     element.disabled = true;
                 }
             });

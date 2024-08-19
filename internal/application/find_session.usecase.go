@@ -28,8 +28,10 @@ type FindSessionOutputDto struct {
 	Date             time.Time     `json:"date"`
 	Duration         time.Duration `json:"duration"`
 	PatientName      string        `json:"patient_name"`
+	PatientId        string        `json:"patient_id"`
 	Plan             string        `json:"plan"`
 	ProfessionalName string        `json:"professional_name"`
+	ProfessionalId   string        `json:"professional_id"`
 }
 
 func (u *FindSessionUseCase) Execute(ctx context.Context, input FindSessionInputDto) (FindSessionOutputDto, error) {
@@ -50,5 +52,7 @@ func (u *FindSessionUseCase) Execute(ctx context.Context, input FindSessionInput
 	dto.PatientName = session.Patient.Name
 	dto.ProfessionalName = session.Professional.Name
 	dto.Plan = session.Plan
+	dto.PatientId = session.Patient.ID
+	dto.ProfessionalId = session.Professional.ID
 	return dto, nil
 }

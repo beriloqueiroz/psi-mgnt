@@ -35,6 +35,11 @@ templ sessionsForm(items application.ListSessionsOutputDto) {
                         </div>
                     </form>
                 </td>
+                <td class="min-w-32">
+                    <a href={templ.SafeURL("/session/"+item.ID)} class="m-auto text-center w-fit flex flex-col justify-center">
+                      ver
+                    </a>
+                </td>
             </tr>
         }
         if len(items.Content) == 0 {
