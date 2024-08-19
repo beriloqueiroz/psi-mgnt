@@ -130,11 +130,24 @@ func (mr *MongoSessionRepository) List(ctx context.Context, input application.Li
 		Size:     100,
 	}, nil
 }
-func (m *MongoSessionRepository) Update(ctx context.Context, session *domain.Session) error {
+func (mr *MongoSessionRepository) Update(ctx context.Context, session *domain.Session) error {
+	filter := bson.D{{"id", session.ID}}
+	_, err := mr.SessionCollection.ReplaceOne(ctx, filter, session)
+	if err != nil {
+		return err
+	}
 	return nil
 }
-func (m *MongoSessionRepository) Find(ctx context.Context, input application.FindSessionRepositoryInput) (*domain.Session, error) {
-	return nil, nil
+func (mr *MongoSessionRepository) Find(ctx context.Context, input application.FindSessionRepositoryInput) (*domain.Session, error) {
+	filter := bson.D{{"id", input.ID}}
+	result := mr.SessionCollection.FindOne(ctx, filter)
+	var session *domain.Session
+
+	err := result.Decode(&session)
+	if err != nil {
+		return nil, err
+	}
+	return session, nil
 }
 
 func (mr *MongoSessionRepository) ListByProfessional(ctx context.Context, input application.ListByProfessionalRepositoryInput) (*helpers.Pages[domain.Session], error) {
