@@ -9,6 +9,7 @@ import (
 	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/api_routes"
 	webserver "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/server"
 	routes_view "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/otel_b"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -35,21 +36,26 @@ func main() {
 		panic(err)
 	}
 
-	// telemetry
-	//otel := otel_b.OtelB{}
-	//shutdown, err := otel.InitTraceProvider("web server psi-mgmt", configs.OtelExporterEndpoint)
-	//if err != nil {
-	//	slog.Error(err.Error(), err)
-	//}
-	//defer func() {
-	//	fmt.Println("oiaaaa")
-	//	if err := shutdown(initCtx); err != nil {
-	//		slog.Error("failed shutdown TraceProvider: %w", err)
-	//	}
-	//}()
+	var server *webserver.WebServer
 
-	//server := webserver.NewWebServer(configs.WebServerPort, otel.WithRouteTag)
-	server := webserver.NewWebServer(configs.WebServerPort, nil)
+	// telemetry
+	var shutdown func(context.Context) error
+	if configs.OtelEnabled {
+		otel := otel_b.OtelB{}
+		shutdown, err = otel.InitTraceProvider("web server psi-mgmt", configs.OtelExporterEndpoint)
+		if err != nil {
+			slog.Error(err.Error(), err)
+		}
+		defer func() {
+			fmt.Println("oiaaaa")
+			if err := shutdown(initCtx); err != nil {
+				slog.Error("failed shutdown TraceProvider: %w", err)
+			}
+		}()
+		server = webserver.NewWebServer(configs.WebServerPort, otel.WithRouteTag)
+	} else {
+		server = webserver.NewWebServer(configs.WebServerPort, nil)
+	}
 
 	// repositories and gateways
 	var sessionRepository application.SessionRepositoryInterface
@@ -113,7 +119,9 @@ func main() {
 	// Wait for interruption.
 	select {
 	case <-sigCh:
-		slog.Warn("Shutting down gracefully, CTRL+C pressed...")
+		{
+			slog.Warn("Shutting down gracefully, CTRL+C pressed...")
+		}
 	case <-initCtx.Done():
 		slog.Warn("Shutting down due to other reason...")
 	}

@@ -10,6 +10,7 @@ type Conf struct {
 	DBProfessionalCollection string `mapstructure:"DB_PROFESSIONAL_COLLECTION"`
 	WebServerPort            string `mapstructure:"WEB_SERVER_PORT"`
 	OtelExporterEndpoint     string `mapstructure:"OTEL_EXPORTER_OTLP_ENDPOINT"`
+	OtelEnabled              bool   `mapstructure:"OTEL_ENABLED"`
 }
 
 func LoadConfig(paths []string) (*Conf, error) {
