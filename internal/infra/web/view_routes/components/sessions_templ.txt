@@ -1,0 +1,13 @@
+<main class=\"mx-auto\"><h1>Lista de Sessões</h1><table><thead><tr><th>ID</th><th>Paciente</th><th>Data e Hora</th><th>Plano</th><th>Profissional</th></tr></thead> <tbody>
+<tr><td>
+</td><td>
+</td><td>
+</td><td>
+</td><td>
+</td><td class=\"min-w-32\"><form action=\"
+\" method=\"POST\" class=\"m-auto text-center w-fit flex flex-col justify-center\"><div class=\"mx-auto\"><input type=\"hidden\" name=\"id\" value=\"
+\">
+</div></form></td><td class=\"min-w-32\"><a href=\"
+\" class=\"m-auto text-center w-fit flex flex-col justify-center\">ver</a></td></tr>
+<tr><td colspan=\"5\">Nenhuma sessão cadastrada.</td></tr>
+</tbody></table></main>

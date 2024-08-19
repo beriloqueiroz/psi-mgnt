@@ -20,6 +20,11 @@ templ sessionForm(session application.FindSessionOutputDto) {
             }
         }
         @InputText("profissional_nome", true, "Profissional", session.ProfessionalName)
+        @Select("professional_id", false, "", "2", "hidden") {
+                    if session.PatientId != "" {
+                        <option selected class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent" value={session.ProfessionalId}>{session.ProfessionalId}</option>
+                    }
+        }
         @InputText("duracao", true, "Duração", strconv.FormatFloat(session.Duration.Minutes(), 'f', -1, 64)+"min")
         <div class="flex justify-between gap-2">
             @InputDate("data_hora", true, "Data e Hora", session.Date.Format("2006-01-02T15:04:05"))

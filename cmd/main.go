@@ -71,12 +71,14 @@ func main() {
 	deleteSessionUseCase := application.NewDeleteSessionUseCase(sessionRepository)
 	listSessionsUsecase := application.NewListSessionsUseCase(sessionRepository)
 	searchPatientsUseCase := application.NewSearchPatientsUseCase(sessionRepository)
+	searchProfessionalsUseCase := application.NewSearchProfessionalsUseCase(sessionRepository)
 	createProfessionalUseCase := application.NewCreateProfessionalUseCase(sessionRepository)
 
 	// api api_routes
 	createSessionRoute := api_routes.NewCreateSessionRoute(*createSessionUseCase)
 	createProfessionalRoute := api_routes.NewCreateProfessionalRoute(*createProfessionalUseCase)
 	searchPatientsRoute := api_routes.NewSearchPatientsRoute(*searchPatientsUseCase)
+	searchProfesionalsRoute := api_routes.NewSearchProfessionalsRoute(*searchProfessionalsUseCase)
 	deleteSessionRoute := api_routes.NewDeleteSessionRoute(*deleteSessionUseCase)
 	listSessionRoute := api_routes.NewListSessionsRoute(*listSessionsUsecase)
 
@@ -85,6 +87,7 @@ func main() {
 	server.AddRoute("GET /api", listSessionRoute.Handler)
 	server.AddRoute("DELETE /api/{id}", deleteSessionRoute.Handler)
 	server.AddRoute("GET /api/patient", searchPatientsRoute.Handler)
+	server.AddRoute("GET /api/professional", searchProfesionalsRoute.Handler)
 
 	// views
 	sessionRouteView := routes_view.NewSessionRouteView(*createSessionUseCase, *updateSessionUseCase, *findSessionUseCase)

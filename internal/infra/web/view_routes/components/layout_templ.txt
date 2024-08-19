@@ -1,0 +1,3 @@
+<!doctype html><html lang=\"pt=br\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Gerenciador</title><link href=\"/static/css/tailwind.css\" rel=\"stylesheet\"><link href=\"/static/css/global.css\" rel=\"stylesheet\"><link href=\"/static/css/tables.css\" rel=\"stylesheet\"></head><header>
+</header><body class=\"mx-4 mb-12\">
+</body><footer class=\"mx-2 flex justify-center w-full my-12\">by Berilo Queiroz</footer></html>
