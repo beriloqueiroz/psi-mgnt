@@ -20,14 +20,14 @@ templ sessionForm(session application.FindSessionOutputDto) {
             }
         }
         @InputText("profissional_nome", true, "Profissional", session.ProfessionalName)
-        @Select("professional_id", false, "", "2", "hidden") {
-                    if session.PatientId != "" {
-                        <option selected class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent" value={session.ProfessionalId}>{session.ProfessionalId}</option>
-                    }
+        @Select("profissional_id", false, "", "2", "hidden") {
+            if session.ProfessionalId != "" {
+                <option selected class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent" value={session.ProfessionalId}>{session.ProfessionalId}</option>
+            }
         }
-        @InputText("duracao", true, "Duração", strconv.FormatFloat(session.Duration.Minutes(), 'f', -1, 64)+"min")
+        @InputText("duracao", true, "Duração", strconv.FormatFloat(session.Duration.Minutes(), 'f', -1, 64)+"m")
         <div class="flex justify-between gap-2">
-            @InputDate("data_hora", true, "Data e Hora", session.Date.Format("2006-01-02T15:04:05"))
+            @InputDate("data_hora", true, "Data e Hora", session.Date.Format("2006-01-02T15:04"))
             @InputText("preco", false, "Preço", strconv.FormatFloat(session.Price, 'f', -1, 64))
         </div>
         @Select("plano", true, "Plano", "1", "") {
@@ -35,7 +35,6 @@ templ sessionForm(session application.FindSessionOutputDto) {
             <option class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent" selected={strconv.FormatBool(session.Plan=="PARTICULAR")} value="PARTICULAR">PARTICULAR</option>
         }
         @InputTextArea("notas", false, "4", "Notas", session.Notes)
-        <input type="text" hidden="hidden" id="profissional_id" name="profissional_id" value="b73f94d7-825e-447a-94e0-7e44c8700c19">
         <input type="text" hidden="hidden" id="session_id" name="session_id" value={session.ID}>
         if session.ID != "" {
             @Button("salvar", "submit")
@@ -76,12 +75,36 @@ templ sessionForm(session application.FindSessionOutputDto) {
             }
         }
         patientNameSearch.onkeyup = searchPatients;
+
         var professionalNameSearch = document.getElementById("profissional_nome")
+        var selectProfessional = document.getElementById("profissional_id")
+        var selectProfissionalContainer = document.getElementById("profissional_id-container")
         function searchProfessionals() {
             if (professionalNameSearch.value.length > 3){
-                fetch('/api/professional?term='+elem2.value)
+                fetch('/api/professional?term='+professionalNameSearch.value)
                     .then(T => T.json())
-                    .then(console.log)
+                    .then(res=>{
+                        selectProfessional.innerHTML = null;
+                        for (var i = 0; i<res.length; i++){
+                            const item = res[i];
+                            var opt = document.createElement('option');
+                            opt.value = item.id;
+                            opt.innerHTML = item.name;
+                            opt.onclick = (event)=> {
+                                const professionalNameSearchOpt = document.getElementById("profissional_nome")
+                                professionalNameSearchOpt.value=event.target.text
+                                selectProfissionalContainer.classList.add('hidden');
+                            }
+                            selectProfessional.appendChild(opt);
+                        }
+                        if (res.length>0){
+                            selectProfissionalContainer.classList.remove('hidden');
+                        } else {
+                            selectProfissionalContainer.classList.add('hidden');
+                        }
+                    })
+            } else {
+                selectProfissionalContainer.classList.add('hidden');
             }
         }
         professionalNameSearch.onkeyup = searchProfessionals;

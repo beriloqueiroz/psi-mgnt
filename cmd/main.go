@@ -93,7 +93,7 @@ func main() {
 	sessionRouteView := routes_view.NewSessionRouteView(*createSessionUseCase, *updateSessionUseCase, *findSessionUseCase)
 	server.AddRoute("GET /session", sessionRouteView.HandlerGet)
 	server.AddRoute("GET /session/{id}", sessionRouteView.HandlerGet)
-	server.AddRoute("POST /session", sessionRouteView.HandlerPost)
+	server.AddRoute("POST /session/", sessionRouteView.HandlerPost)
 	server.AddRoute("POST /session/{id}", sessionRouteView.HandlerPost)
 
 	createProfessionalRouteView := routes_view.NewCreateProfessionalRouteView(*createProfessionalUseCase)

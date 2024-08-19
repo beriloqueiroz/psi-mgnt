@@ -3,6 +3,7 @@ package routes_view
 import (
 	"fmt"
 	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes/components"
+	"github.com/beriloqueiroz/psi-mgnt/pkg/helpers"
 	"net/http"
 	"strconv"
 	"time"
@@ -57,12 +58,12 @@ func (cr *SessionRouteView) HandlerPost(w http.ResponseWriter, r *http.Request) 
 	} else {
 		input.PatientName = r.FormValue("paciente_nome")
 		input.PatientId = r.FormValue("paciente_id")
-		input.Date, err = time.Parse("2006-01-02T15:04", r.FormValue("data_hora"))
+		year, month, day, hour, mi, _, err := helpers.DecomposeStringDate(r.FormValue("data_hora") + ":00")
+		input.Date = time.Date(year, time.Month(month), day, hour, mi, 0, 0, time.UTC)
 		input.Plan = r.FormValue("plano")
 		input.Duration, err = time.ParseDuration(r.FormValue("duracao"))
 		input.Price, err = strconv.ParseFloat(r.FormValue("preco"), 64)
 		input.ProfessionalId = r.FormValue("profissional_id")
-
 		if err != nil {
 			msg := struct {
 				Message string `json:"message"`

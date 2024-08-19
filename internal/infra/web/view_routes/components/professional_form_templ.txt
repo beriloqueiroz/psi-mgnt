@@ -1,2 +1,0 @@
-<main class=\"mx-auto\"><h1>Cadastro de Profissional</h1><form action=\"/professional\" method=\"POST\" class=\"w-1/2 flex flex-col gap-1 m-auto\">
-</form></main>
