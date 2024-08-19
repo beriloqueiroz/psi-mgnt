@@ -61,3 +61,12 @@ func (s *Session) IsValid() error {
 	}
 	return nil
 }
+
+func (s *Session) ChangeNote(notes string) error {
+	s.Notes = notes
+	err := s.IsValid()
+	if err != nil {
+		return err
+	}
+	return nil
+}
