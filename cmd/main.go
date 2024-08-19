@@ -9,7 +9,6 @@ import (
 	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/api_routes"
 	webserver "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/server"
 	routes_view "github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes"
-	"github.com/beriloqueiroz/psi-mgnt/pkg/otel_b"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -22,8 +21,8 @@ func main() {
 	// graceful exit
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt)
-	initCtx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer cancel()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
 
 	// config logs
 	// aqui no lugar do Stdout poderia ser um db ou elasticsearch por exemplo
@@ -36,40 +35,51 @@ func main() {
 		panic(err)
 	}
 
-	var server *webserver.WebServer
+	server := webserver.NewWebServer(configs.WebServerPort)
 
-	// telemetry
-	var shutdown func(context.Context) error
-	if configs.OtelEnabled {
-		otel := otel_b.OtelB{}
-		shutdown, err = otel.InitTraceProvider("web server psi-mgmt", configs.OtelExporterEndpoint)
-		if err != nil {
-			slog.Error(err.Error(), err)
-		}
-		defer func() {
-			fmt.Println("oiaaaa")
-			if err := shutdown(initCtx); err != nil {
-				slog.Error("failed shutdown TraceProvider: %w", err)
-			}
-		}()
-		server = webserver.NewWebServer(configs.WebServerPort, otel.WithRouteTag)
-	} else {
-		server = webserver.NewWebServer(configs.WebServerPort, nil)
+	err = startRoutes(server, ctx, *configs)
+	if err != nil {
+		panic(err)
 	}
 
+	srvErr := make(chan error, 1)
+	go func() {
+		fmt.Println("Starting web server on port", configs.WebServerPort)
+		srvErr <- server.Start()
+	}()
+
+	// Wait for interruption.
+	select {
+	case <-sigCh:
+		{
+			slog.Warn("Shutting down gracefully, CTRL+C pressed...")
+			return
+		}
+	case <-srvErr:
+		{
+			slog.Error("Shutting down gracefully, Server error pressed...")
+			return
+		}
+	case <-ctx.Done():
+		slog.Warn("Shutting down due to other reason...")
+	}
+}
+
+func startRoutes(server *webserver.WebServer, ctx context.Context, configs config.Conf) error {
+
+	var err error
 	// repositories and gateways
 	var sessionRepository application.SessionRepositoryInterface
 	sessionRepository, err = infra.NewMongoSessionRepository(
-		initCtx,
+		ctx,
 		configs.DBUri,
 		configs.DBPatientCollection,
 		configs.DBProfessionalCollection,
 		configs.DBSessionCollection,
 		configs.DBDatabase)
 	if err != nil {
-		panic(err)
+		return err
 	}
-
 	// usecases
 	createSessionUseCase := application.NewCreateSessionUseCase(sessionRepository)
 	updateSessionUseCase := application.NewUpdateSessionUseCase(sessionRepository)
@@ -112,17 +122,5 @@ func main() {
 	server.AddRoute("POST /sessions/{id}", listSessionRouteView.HandlerPost)
 
 	server.AddRoute("GET /", routes_view.NewHomeRouteView().HandlerGet)
-
-	fmt.Println("Starting web server on port", configs.WebServerPort)
-	server.Start()
-
-	// Wait for interruption.
-	select {
-	case <-sigCh:
-		{
-			slog.Warn("Shutting down gracefully, CTRL+C pressed...")
-		}
-	case <-initCtx.Done():
-		slog.Warn("Shutting down due to other reason...")
-	}
+	return nil
 }
