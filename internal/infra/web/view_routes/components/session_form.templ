@@ -1,46 +1,96 @@
 package components
 
-import "time"
+import "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
+import "strconv"
 
-templ SessionForm() {
-    @Layout(sessionForm())
+templ SessionForm(session domain.Session) {
+    @Layout(sessionForm(session))
 }
 
-templ sessionForm() {
-	<h1>Cadastro de Sessão</h1>
-    <form action="/session" method="POST" class="w-1/2 flex flex-col gap-1 m-auto">
-        @InputText("paciente_nome", true, "Paciente", "")
-        @InputText("profissional_nome", true, "Profissional", "")
-        @InputText("duracao", true, "Duração", "50m")
-        <div class="flex justify-between gap-2">
-            @InputDate("data_hora", true, "Data e Hora", time.Now().Format("02/Jan/2006 15:04:05 "))
-            @InputText("preco", false, "Preço", "25")
-        </div>
-        @InputText("plano", false, "Plano", "UNIMED FORTALEZA")
-        @InputTextArea("notas", false, "4", "Notas", "")
-        <input type="text" hidden="hidden" id="profissional_id" name="profissional_id">
-        <input type="text" hidden="hidden" id="paciente_id" name="paciente_id">
+templ Empty() {
+}
 
-        @Button("cadastrar", "submit")
+templ sessionForm(session domain.Session) {
+	<h1>Cadastro de Sessão</h1>
+    <form action={templ.SafeURL("/session"+session.ID)} method="POST" class="w-1/2 flex flex-col gap-1 m-auto" id="form_session">
+        @InputText("paciente_nome", true, "Paciente", session.Patient.Name)
+        @Select("paciente_id", false, "", "4", "hidden") {
+            if session.Patient.ID != "" {
+                <option selected class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent" value={session.Patient.ID}>{session.Patient.ID}</option>
+            }
+        }
+        @InputText("profissional_nome", true, "Profissional", session.Professional.Name)
+        @InputText("duracao", true, "Duração", strconv.FormatFloat(session.Duration.Minutes(), 'f', -1, 64)+"min")
+        <div class="flex justify-between gap-2">
+            @InputDate("data_hora", true, "Data e Hora", session.Date.Format("2006-01-02T15:04:05"))
+            @InputText("preco", false, "Preço", strconv.FormatFloat(session.Price, 'f', -1, 64))
+        </div>
+        @Select("plano", true, "Plano", "1", "") {
+            <option class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent" selected={strconv.FormatBool(session.Plan=="UNIMED FORTALEZA")} value="UNIMED FORTALEZA">UNIMED FORTALEZA</option>
+            <option class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent" selected={strconv.FormatBool(session.Plan=="PARTICULAR")} value="PARTICULAR">PARTICULAR</option>
+        }
+        @InputTextArea("notas", false, "4", "Notas", session.Notes)
+        <input type="text" hidden="hidden" id="profissional_id" name="profissional_id" value="b73f94d7-825e-447a-94e0-7e44c8700c19">
+        <input type="text" hidden="hidden" id="session_id" name="session_id" value={session.ID}>
+        if session.ID != "" {
+            @Button("salvar", "submit")
+        } else {
+            @Button("cadastrar", "submit")
+        }
     </form>
     <script type="text/javascript">
-        var elem = document.getElementById("paciente_nome")
-        var elem2 = document.getElementById("profissional_nome")
-        function searPatients() {
-            if (elem.value.length > 3){
-                fetch('/api/patient?term='+elem.value)
+        var patientNameSearch = document.getElementById("paciente_nome")
+        var selectPatient = document.getElementById("paciente_id")
+        var selectPatientContainer = document.getElementById("paciente_id-container")
+        function searchPatients() {
+            if (patientNameSearch.value.length > 3){
+                fetch('/api/patient?term='+patientNameSearch.value)
+                    .then(T => T.json())
+                    .then(res=>{
+                        selectPatient.innerHTML = null;
+                        for (var i = 0; i<res.length; i++){
+                            const item = res[i];
+                            var opt = document.createElement('option');
+                            opt.value = item.id;
+                            opt.innerHTML = item.name;
+                            opt.onclick = (event)=> {
+                                const patientNameSearchOpt = document.getElementById("paciente_nome")
+                                patientNameSearchOpt.value=event.target.text
+                                selectPatientContainer.classList.add('hidden');
+                            }
+                            selectPatient.appendChild(opt);
+                        }
+                        if (res.length>0){
+                            selectPatientContainer.classList.remove('hidden');
+                        } else {
+                            selectPatientContainer.classList.add('hidden');
+                        }
+                    })
+            } else {
+                selectPatientContainer.classList.add('hidden');
+            }
+        }
+        patientNameSearch.onkeyup = searchPatients;
+        var professionalNameSearch = document.getElementById("profissional_nome")
+        function searchProfessionals() {
+            if (professionalNameSearch.value.length > 3){
+                fetch('/api/professional?term='+elem2.value)
                     .then(T => T.json())
                     .then(console.log)
             }
         }
-        function searchProfessionals() {
-                    if (elem2.value.length > 3){
-                        fetch('/api/professional?term='+elem2.value)
-                            .then(T => T.json())
-                            .then(console.log)
-                    }
+        professionalNameSearch.onkeyup = searchProfessionals;
+
+        const sessionElem = document.getElementById("session_id");
+        if (sessionElem.value != "") {
+            const form = document.getElementById("form_session");
+            const all = form.getElementsByTagName("*");
+            const to_enabled = ["notas"];
+            Array.prototype.forEach.call(all, (element) => {
+                if (!to_enabled.includes(element.id)) {
+                    element.disabled = true;
                 }
-        elem.onkeyup = searPatients;
-        elem2.onkeyup = searchProfessionals;
+            });
+        }
     </script>
 }

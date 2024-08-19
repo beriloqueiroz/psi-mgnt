@@ -14,12 +14,12 @@ templ Layout(children ...templ.Component) {
 		<header>
             @Menu()
 		</header>
-		<body class="mx-4">
+		<body class="mx-4 mb-12">
 			for _, child := range children {
 				@child
 			}
 		</body>
-		<footer class="fixed bottom-0 m-2 flex justify-center w-full">
+		<footer class="mx-2 flex justify-center w-full my-12">
 		    by Berilo Queiroz
 		</footer>
 	</html>

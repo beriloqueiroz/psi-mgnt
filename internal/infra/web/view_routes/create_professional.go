@@ -44,8 +44,6 @@ func (cr *CreateProfessionalRouteView) HandlerPost(w http.ResponseWriter, r *htt
 		return
 	}
 
-	fmt.Println(input)
-
 	_, err = cr.CreateProfessionalUseCase.Execute(r.Context(), input)
 
 	if err != nil {

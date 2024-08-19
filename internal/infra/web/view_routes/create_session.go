@@ -2,6 +2,7 @@ package routes_view
 
 import (
 	"fmt"
+	domain "github.com/beriloqueiroz/psi-mgnt/internal/domain/entity"
 	"github.com/beriloqueiroz/psi-mgnt/internal/infra/web/view_routes/components"
 	"net/http"
 	"strconv"
@@ -19,7 +20,20 @@ func NewCreateSessionRouteView(createSessionUseCase application.CreateSessionUse
 }
 
 func (cr *CreateSessionRouteView) HandlerGet(w http.ResponseWriter, r *http.Request) {
-	h := components.SessionForm()
+	session := domain.Session{ID: "", Patient: &domain.Patient{ID: "111", Name: "berilo ttt"},
+		Professional: &domain.Professional{ID: "111233", Name: "ric"},
+		Duration:     time.Hour,
+		Notes:        "aiaiai aiaiai",
+		Plan:         "PARTICULAR",
+		Price:        50,
+		Date:         time.Now(),
+	}
+	if session.ID == "" {
+		session.Date = time.Now()
+		session.Duration = time.Minute * 50
+		session.Price = 50
+	}
+	h := components.SessionForm(session)
 	err := h.Render(r.Context(), w)
 	if err != nil {
 		fmt.Println(err)

@@ -34,7 +34,7 @@ func Layout(children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</header><body class=\"mx-4\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</header><body class=\"mx-4 mb-12\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -44,7 +44,7 @@ func Layout(children ...templ.Component) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</body><footer class=\"fixed bottom-0 m-2 flex justify-center w-full\">by Berilo Queiroz</footer></html>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</body><footer class=\"mx-2 flex justify-center w-full my-12\">by Berilo Queiroz</footer></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
